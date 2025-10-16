@@ -1,0 +1,27 @@
+### get all users
+GET localhost:9080/lab1/api/user/
+
+### get user by id
+#@id=f01b842f-5b6c-4989-aa5f-6a5ad7a544fb
+GET localhost:9080/lab1/api/user/595e6b23-bf6c-41fa-b10f-537388b9b416
+
+### post
+POST localhost:9080/lab1/api/user/
+Content-Type: application/json
+
+{
+  "name": "123",
+  "email": "123@gmail.com"
+}
+
+### delete
+DELETE localhost:9080/lab1/api/user/1c1bfe23-9328-45a4-a6bc-6742e8fea5da
+
+### update
+PUT localhost:9080/lab1/api/user/80a9aacd-5017-4b04-b415-6386f29d5366
+Content-Type: application/json
+
+{
+  "name": "456",
+  "email": "456@gmail.com"
+}
