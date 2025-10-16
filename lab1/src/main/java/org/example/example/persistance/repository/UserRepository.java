@@ -1,11 +1,7 @@
 package org.example.example.persistance.repository;
 
 import org.example.example.persistance.domain.User;
-import org.example.example.persistance.dtos.UserCreatedRequest;
-
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 public class UserRepository implements Repository<User, UUID> {
@@ -43,8 +39,8 @@ public class UserRepository implements Repository<User, UUID> {
     public UUID create(User user) {
         UUID id = UUID.randomUUID();
         user.setId(id);
-        System.out.println(user);
-        return users.put(id, user) != null ? id : null;
+        users.put(id, user);
+        return id;
     }
 
     @Override
@@ -54,7 +50,11 @@ public class UserRepository implements Repository<User, UUID> {
 
     @Override
     public UUID update(UUID id, User user) {
-        return users.put(id, user) != null ? id : null;
+        if (users.containsKey(id)) {
+            users.put(id, user);
+            return id;
+        }
+        return null;
     }
 
 
@@ -64,12 +64,9 @@ public class UserRepository implements Repository<User, UUID> {
         return user.getAvatar();
     }
 
-    public UUID setAvatar(UUID id, InputStream inputStream) throws IOException {
-        System.out.println(0);
+    public UUID setAvatar(UUID id, byte[] file) throws IOException {
         User user = findById(id).orElseThrow(IllegalArgumentException::new);
-        System.out.println(1);
-        user.setAvatar(inputStream.readAllBytes());
-        System.out.println(2);
+        user.setAvatar(file);
         return id;
     }
 

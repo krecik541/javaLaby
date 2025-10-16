@@ -16,13 +16,13 @@ import java.util.UUID;
 public class InitData implements ServletContextListener {
 
     private UserRepository repository;
-    private Path avatarDir;
+    private Path dir;
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
         repository = UserRepository.getInstance();
-        String avatarParam = event.getServletContext().getInitParameter("avatarDir");
-        avatarDir = Path.of(event.getServletContext().getRealPath("/"), avatarParam);
+        String avatarParam = event.getServletContext().getInitParameter("dir");
+        dir = Path.of(event.getServletContext().getRealPath("/"), avatarParam);
 
         initData();
     }
@@ -33,7 +33,7 @@ public class InitData implements ServletContextListener {
                 .name("Adam Smith")
                 .email("adamsmith@gmail.com")
                 .recipes(new ArrayList<>())
-                .avatar(readAvatar("guest.png"))
+                .avatar(readAvatar("gordon.png"))
                 .build();
         User user2 = User.builder()
                 .id(UUID.randomUUID())
@@ -62,7 +62,7 @@ public class InitData implements ServletContextListener {
 
     private byte[] readAvatar(String fileName) {
         try {
-            Path avatarPath = avatarDir.resolve(fileName);
+            Path avatarPath = dir.resolve(fileName);
             if (Files.exists(avatarPath)) {
                 return Files.readAllBytes(avatarPath);
             } else {

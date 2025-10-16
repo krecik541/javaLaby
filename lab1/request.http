@@ -3,7 +3,7 @@ GET localhost:9080/lab1/api/user/
 
 ### get user by id
 #@id=f01b842f-5b6c-4989-aa5f-6a5ad7a544fb
-GET localhost:9080/lab1/api/user/595e6b23-bf6c-41fa-b10f-537388b9b416
+GET localhost:9080/lab1/api/user/b5a14273-ad55-494d-adf7-b9a9b03381b8
 
 ### post
 POST localhost:9080/lab1/api/user/
@@ -15,10 +15,10 @@ Content-Type: application/json
 }
 
 ### delete
-DELETE localhost:9080/lab1/api/user/1c1bfe23-9328-45a4-a6bc-6742e8fea5da
+DELETE localhost:9080/lab1/api/user/dffa4e4c-207d-448e-aad2-d4bc86013f08
 
 ### update
-PUT localhost:9080/lab1/api/user/80a9aacd-5017-4b04-b415-6386f29d5366
+PUT localhost:9080/lab1/api/user/dffa4e4c-207d-448e-aad2-d4bc86013f08
 Content-Type: application/json
 
 {
@@ -30,17 +30,17 @@ Content-Type: application/json
 
 #######################
 ### get avatar
-GET localhost:9080/lab1/api/user/avatar/d02e5d44-8a88-4e01-abd0-74a3a8c30891
+GET localhost:9080/lab1/api/user/avatar/928a5d7b-01c3-4cdc-9e32-2865ffc3e1d6
 
 ### PUT/POST avatar
-POST localhost:9080/lab1/api/user/avatar/5ca21827-dcb8-4e2e-8f9c-2e453c38aa4e
+POST localhost:9080/lab1/api/user/avatar/928a5d7b-01c3-4cdc-9e32-2865ffc3e1d6
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
-Content-Disposition: form-data; name="avatar"; filename="guest.png'
+Content-Disposition: form-data; name="avatar"; filename="maklowicz.png"
 
-< src/main/resources/avatars/guest.png
+< src/main/resources/avatars/maklowicz.png
 --boundary--
 
 ### delete avatar
-DELETE localhost:9080/lab1/api/user/avatar/75ff34e2-ebb7-4764-92fe-233c8acc1afa
+DELETE localhost:9080/lab1/api/user/avatar/928a5d7b-01c3-4cdc-9e32-2865ffc3e1d6

@@ -1,10 +1,9 @@
 package org.example.example.service;
 
 import org.example.example.persistance.domain.User;
-import org.example.example.persistance.dtos.UserCreatedRequest;
+import org.example.example.persistance.dtos.UserRequestDTO;
 import org.example.example.persistance.repository.UserRepository;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -35,13 +34,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public UUID create(UserCreatedRequest dto) {
+    public UUID create(UserRequestDTO dto) {
         User user = User.builder()
                         .name(dto.getName())
                         .email(dto.getEmail())
                         .build();
         validate(userRepository.create(user));
-        System.out.println(user.getId());
         return user.getId();
     }
 
@@ -50,14 +48,19 @@ public class UserService {
         return id;
     }
 
-    // TODO: potencjanie usuwanie reciept i avatar
-    public UUID update(UUID uuid, UserCreatedRequest dto) {
+    public UUID update(UUID uuid, UserRequestDTO dto) {
+        Optional<User> existingUserOpt = userRepository.findById(uuid);
+        if (existingUserOpt.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        
+        User existingUser = existingUserOpt.get();
         User user = User.builder()
                 .id(uuid)
                 .name(dto.getName())
                 .email(dto.getEmail())
-                .recipes(null)
-                .avatar(null)
+                .recipes(existingUser.getRecipes())
+                .avatar(existingUser.getAvatar())
                 .build();
         validate(userRepository.update(uuid, user));
         return uuid;
@@ -69,8 +72,7 @@ public class UserService {
     }
 
     public UUID setAvatar(UUID id, InputStream inputStream) throws IOException {
-        System.out.println(55);
-        return userRepository.setAvatar(id, inputStream);
+        return userRepository.setAvatar(id, inputStream.readAllBytes());
     }
 
     public UUID deleteAvatar(UUID id) {
@@ -79,7 +81,7 @@ public class UserService {
 
     private void validate(UUID id) {
         if (id == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Operation failed");
         }
     }
 }

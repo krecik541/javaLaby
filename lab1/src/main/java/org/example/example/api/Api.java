@@ -10,9 +10,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.example.controller.UserController;
-import org.example.example.persistance.domain.User;
-import org.example.example.persistance.dtos.UserCreatedRequest;
-import org.example.example.persistance.dtos.UserCreatedResponse;
+import org.example.example.persistance.dtos.UserRequestDTO;
+import org.example.example.persistance.dtos.UserResponseDTO;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -36,14 +35,18 @@ public class Api extends HttpServlet {
 
         String path = getUUIDFromPath(req);
 
-        if (path.isEmpty()) {
+        if (path == null || path.isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write(jsonb.toJson(userController.findAll()));
         } else {
-            UUID id = UUID.fromString(path);
             try {
-                User user = userController.findById(id);
-                resp.setStatus(HttpServletResponse.SC_FOUND);
+                UUID id = UUID.fromString(path);
+                UserResponseDTO user = userController.findById(id);
+                resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().write(jsonb.toJson(user));
+            } catch (IllegalArgumentException e) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("ERROR: invalid UUID format");
             } catch (Exception e) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 resp.getWriter().write("ERROR: user not found");
@@ -56,7 +59,7 @@ public class Api extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            UserCreatedRequest dto = jsonb.fromJson(req.getInputStream(), UserCreatedRequest.class);
+            UserRequestDTO dto = jsonb.fromJson(req.getInputStream(), UserRequestDTO.class);
             UUID uuid = userController.create(dto);
 
             resp.setContentType("application/json");
@@ -68,30 +71,48 @@ public class Api extends HttpServlet {
         }
     }
 
+    @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
-            UserCreatedRequest dto = jsonb.fromJson(req.getInputStream(), UserCreatedRequest.class);
+            UserRequestDTO dto = jsonb.fromJson(req.getInputStream(), UserRequestDTO.class);
             UUID id = UUID.fromString(getUUIDFromPath(req));
 
             id = userController.update(id, dto);
 
-
+            resp.setContentType("application/json");
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().write(jsonb.toJson(id));
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("ERROR: something went wrong");
+            resp.getWriter().write("ERROR: failed to update user");
         }
     }
 
+    @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        UUID id = UUID.fromString(getUUIDFromPath(req));
-        userController.delete(id);
+        resp.setContentType("application/json");
+
+        try {
+            UUID id = UUID.fromString(getUUIDFromPath(req));
+            userController.delete(id);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().write("User deleted successfully");
+        } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write("ERROR: user not found or deletion failed");
+        }
     }
 
 
 
     private String getUUIDFromPath(HttpServletRequest req) {
-        return req.getPathInfo().substring(1);
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            return null;
+        }
+        return pathInfo.substring(1);
     }
 }

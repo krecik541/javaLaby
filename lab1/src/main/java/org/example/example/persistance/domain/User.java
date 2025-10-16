@@ -2,7 +2,6 @@ package org.example.example.persistance.domain;
 
 import lombok.*;
 
-import java.io.File;
 import java.util.List;
 import java.util.UUID;
 

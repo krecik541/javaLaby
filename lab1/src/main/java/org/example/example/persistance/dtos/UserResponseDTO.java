@@ -9,8 +9,9 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-public class UserCreatedResponse {
+public class UserResponseDTO {
     private UUID id;
     private String name;
     private String email;
+    private boolean hasAvatar = false;
 }

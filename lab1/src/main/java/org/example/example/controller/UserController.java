@@ -1,14 +1,15 @@
 package org.example.example.controller;
 
 import org.example.example.persistance.domain.User;
-import org.example.example.persistance.dtos.UserCreatedRequest;
+import org.example.example.persistance.dtos.UserRequestDTO;
+import org.example.example.persistance.dtos.UserResponseDTO;
 import org.example.example.service.UserService;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class UserController {
 
@@ -26,16 +27,30 @@ public class UserController {
         return instance;
     }
 
-    public User findById(UUID id) {
-        return userService.findById(id).
-                orElseThrow();
+    public UserResponseDTO findById(UUID id) {
+        return userService.findById(id)
+                .map(user -> UserResponseDTO.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .hasAvatar(user.getAvatar() != null)
+                        .build())
+                .orElseThrow();
     }
 
-    public List<User> findAll() {
-        return userService.findAll();
+    public List<UserResponseDTO> findAll() {
+        return userService.findAll()
+                .stream()
+                .map(user -> UserResponseDTO.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .hasAvatar(user.getAvatar() != null)
+                        .build())
+                .collect(Collectors.toList());
     }
 
-    public UUID create(UserCreatedRequest user) {
+    public UUID create(UserRequestDTO user) {
         return userService.create(user);
     }
 
@@ -43,7 +58,7 @@ public class UserController {
         return userService.delete(id);
     }
 
-    public UUID update(UUID id, UserCreatedRequest user) {
+    public UUID update(UUID id, UserRequestDTO user) {
         return userService.update(id, user);
     }
 
@@ -54,7 +69,6 @@ public class UserController {
     }
 
     public UUID setAvatar(UUID id, InputStream inputStream) throws IOException {
-        System.out.println(77);
         return userService.setAvatar(id, inputStream);
     }
 
