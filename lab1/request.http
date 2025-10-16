@@ -25,3 +25,22 @@ Content-Type: application/json
   "name": "456",
   "email": "456@gmail.com"
 }
+
+
+
+#######################
+### get avatar
+GET localhost:9080/lab1/api/user/avatar/d02e5d44-8a88-4e01-abd0-74a3a8c30891
+
+### PUT/POST avatar
+POST localhost:9080/lab1/api/user/avatar/5ca21827-dcb8-4e2e-8f9c-2e453c38aa4e
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="avatar"; filename="guest.png'
+
+< src/main/resources/avatars/guest.png
+--boundary--
+
+### delete avatar
+DELETE localhost:9080/lab1/api/user/avatar/75ff34e2-ebb7-4764-92fe-233c8acc1afa

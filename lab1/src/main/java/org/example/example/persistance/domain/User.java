@@ -2,6 +2,7 @@ package org.example.example.persistance.domain;
 
 import lombok.*;
 
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public class User {
     private UUID id;
     private String name;
     private String email;
+    private byte[] avatar;
 
     private List<Recipe> recipes;
 

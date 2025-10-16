@@ -5,6 +5,11 @@
          version="6.0"
          metadata-complete="false">
 
+    <context-param>
+        <param-name>avatarDir</param-name>
+        <param-value>avatars</param-value>
+    </context-param>
+
     <listener>
         <listener-class>org.example.example.configuration.listener.InitData</listener-class>
     </listener>

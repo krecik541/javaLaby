@@ -4,6 +4,9 @@ import org.example.example.persistance.domain.User;
 import org.example.example.persistance.dtos.UserCreatedRequest;
 import org.example.example.persistance.repository.UserRepository;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,16 +50,31 @@ public class UserService {
         return id;
     }
 
-    // TODO: potencjanie usuwanie reciept
+    // TODO: potencjanie usuwanie reciept i avatar
     public UUID update(UUID uuid, UserCreatedRequest dto) {
         User user = User.builder()
                 .id(uuid)
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .recipes(null)
+                .avatar(null)
                 .build();
         validate(userRepository.update(uuid, user));
         return uuid;
+    }
+
+
+    public byte[] getAvatar(UUID id) {
+        return userRepository.getAvatar(id);
+    }
+
+    public UUID setAvatar(UUID id, InputStream inputStream) throws IOException {
+        System.out.println(55);
+        return userRepository.setAvatar(id, inputStream);
+    }
+
+    public UUID deleteAvatar(UUID id) {
+        return userRepository.deleteAvatar(id);
     }
 
     private void validate(UUID id) {

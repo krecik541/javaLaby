@@ -4,6 +4,9 @@ import org.example.example.persistance.domain.User;
 import org.example.example.persistance.dtos.UserCreatedRequest;
 import org.example.example.service.UserService;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,5 +45,20 @@ public class UserController {
 
     public UUID update(UUID id, UserCreatedRequest user) {
         return userService.update(id, user);
+    }
+
+
+
+    public byte[] getAvatar(UUID id) {
+        return userService.getAvatar(id);
+    }
+
+    public UUID setAvatar(UUID id, InputStream inputStream) throws IOException {
+        System.out.println(77);
+        return userService.setAvatar(id, inputStream);
+    }
+
+    public UUID deleteAvatar(UUID id) {
+        return userService.deleteAvatar(id);
     }
 }
