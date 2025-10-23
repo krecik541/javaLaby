@@ -10,23 +10,23 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.example.controller.UserController;
-import org.example.example.persistance.dtos.UserRequestDTO;
-import org.example.example.persistance.dtos.UserResponseDTO;
+import org.example.example.controller.CategoryController;
+import org.example.example.persistance.dtos.CategoryRequestDTO;
+import org.example.example.persistance.dtos.CategoryResponseDTO;
 
 import java.io.IOException;
 import java.util.UUID;
 
-@WebServlet("/api/user/*")
+@WebServlet("/api/category/*")
 @MultipartConfig(maxFileSize = 200 * 1024)
-public class Api extends HttpServlet {
+public class ApiCategory extends HttpServlet {
 
     private final Jsonb jsonb = JsonbBuilder.create();
-    private final UserController userController;
+    private final CategoryController categoryController;
 
     @Inject
-    public Api(UserController userController) {
-        this.userController = userController;
+    public ApiCategory(CategoryController categoryController) {
+        this.categoryController = categoryController;
     }
 
     public void init(ServletConfig config) throws ServletException {
@@ -42,11 +42,11 @@ public class Api extends HttpServlet {
 
         if (path == null || path.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write(jsonb.toJson(userController.findAll()));
+            resp.getWriter().write(jsonb.toJson(categoryController.findAll()));
         } else {
             try {
                 UUID id = UUID.fromString(path);
-                UserResponseDTO user = userController.findById(id);
+                CategoryResponseDTO user = categoryController.findById(id);
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().write(jsonb.toJson(user));
             } catch (IllegalArgumentException e) {
@@ -54,7 +54,7 @@ public class Api extends HttpServlet {
                 resp.getWriter().write("ERROR: invalid UUID format");
             } catch (Exception e) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().write("ERROR: user not found");
+                resp.getWriter().write("ERROR: category not found");
             }
         }
     }
@@ -64,8 +64,8 @@ public class Api extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            UserRequestDTO dto = jsonb.fromJson(req.getInputStream(), UserRequestDTO.class);
-            UUID uuid = userController.create(dto);
+            CategoryRequestDTO dto = jsonb.fromJson(req.getInputStream(), CategoryRequestDTO.class);
+            UUID uuid = categoryController.create(dto);
 
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -80,17 +80,15 @@ public class Api extends HttpServlet {
     public void doPut(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
-            UserRequestDTO dto = jsonb.fromJson(req.getInputStream(), UserRequestDTO.class);
-            UUID id = UUID.fromString(getUUIDFromPath(req));
-
-            id = userController.update(id, dto);
+            CategoryRequestDTO dto = jsonb.fromJson(req.getInputStream(), CategoryRequestDTO.class);
+            UUID uuid = categoryController.create(dto);
 
             resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write(jsonb.toJson(id));
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+            resp.getWriter().write(jsonb.toJson(uuid));
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("ERROR: failed to update user");
+            resp.getWriter().write("ERROR: something went wrong");
         }
     }
 
@@ -101,7 +99,7 @@ public class Api extends HttpServlet {
 
         try {
             UUID id = UUID.fromString(getUUIDFromPath(req));
-            userController.delete(id);
+            categoryController.delete(id);
 
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("User deleted successfully");

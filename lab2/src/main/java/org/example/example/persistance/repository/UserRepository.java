@@ -2,7 +2,9 @@ package org.example.example.persistance.repository;
 
 import jakarta.inject.Singleton;
 import org.example.example.persistance.domain.User;
+
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 @Singleton
@@ -52,15 +54,14 @@ public class UserRepository implements Repository<User, UUID> {
     }
 
 
-
-    public byte[] getAvatar(UUID id) {
+    public Path getAvatar(UUID id) {
         User user = findById(id).orElseThrow(IllegalArgumentException::new);
         return user.getAvatar();
     }
 
-    public UUID setAvatar(UUID id, byte[] file) throws IOException {
+    public UUID setAvatar(UUID id, Path path) throws IOException {
         User user = findById(id).orElseThrow(IllegalArgumentException::new);
-        user.setAvatar(file);
+        user.setAvatar(path);
         return id;
     }
 

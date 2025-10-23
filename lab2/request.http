@@ -15,10 +15,10 @@ Content-Type: application/json
 }
 
 ### delete
-DELETE localhost:9080/lab2/api/user/dffa4e4c-207d-448e-aad2-d4bc86013f08
+DELETE localhost:9080/lab2/api/user/1de0306f-6e62-45ae-923e-b9adccbc91d3
 
 ### update
-PUT localhost:9080/lab2/api/user/dffa4e4c-207d-448e-aad2-d4bc86013f08
+PUT localhost:9080/lab2/api/user/c2998624-bad6-460c-8c2c-858780e73302
 Content-Type: application/json
 
 {
@@ -30,10 +30,10 @@ Content-Type: application/json
 
 #######################
 ### get avatar
-GET localhost:9080/lab2/api/user/avatar/ff17c6f5-02a9-433e-96e3-60af5fcb21b1
+GET localhost:9080/lab2/api/user/avatar/05fa71de-9473-4c8d-b341-9f2aa38e1008
 
 ### PUT/POST avatar
-POST localhost:9080/lab2/api/user/avatar/ff17c6f5-02a9-433e-96e3-60af5fcb21b1
+POST localhost:9080/lab2/api/user/avatar/05fa71de-9473-4c8d-b341-9f2aa38e1008
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
@@ -43,4 +43,35 @@ Content-Disposition: form-data; name="avatar"; filename="maklowicz.png"
 --boundary--
 
 ### delete avatar
-DELETE localhost:9080/lab2/api/user/avatar/ff17c6f5-02a9-433e-96e3-60af5fcb21b1
+DELETE localhost:9080/lab2/api/user/avatar/05fa71de-9473-4c8d-b341-9f2aa38e1008
+
+
+
+######################
+### get all categories
+GET localhost:9080/lab2/api/category/
+
+### get category by id
+#@id=f01b842f-5b6c-4989-aa5f-6a5ad7a544fb
+GET localhost:9080/lab2/api/category/bdefde3c-0af1-46e8-9a18-b42f0a71e398
+
+### post
+POST localhost:9080/lab2/api/category/
+Content-Type: application/json
+
+{
+  "name": "Obiad na słodko",
+  "type": "DINNER"
+}
+
+### delete
+DELETE localhost:9080/lab2/api/category/bdefde3c-0af1-46e8-9a18-b42f0a71e398
+
+### update
+PUT localhost:9080/lab2/api/category/bdefde3c-0af1-46e8-9a18-b42f0a71e398
+Content-Type: application/json
+
+{
+  "name": "kolacja",
+  "type": "LUNCH"
+}

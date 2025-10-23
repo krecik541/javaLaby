@@ -1,17 +1,16 @@
-package org.example.example.persistance.domain;
+package org.example.example.persistance.dtos;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.UUID;
 
+@Builder
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-public class Recipe {
+public class RecipeResponseDTO {
     private UUID id;
     private String title;
     private String description;

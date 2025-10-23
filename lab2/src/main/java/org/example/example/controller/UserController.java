@@ -1,18 +1,14 @@
 package org.example.example.controller;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.example.example.persistance.domain.User;
 import org.example.example.persistance.dtos.UserRequestDTO;
 import org.example.example.persistance.dtos.UserResponseDTO;
 import org.example.example.service.UserService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,7 +18,8 @@ public class UserController {
 
     private UserService userService;
 
-    public UserController() {}
+    public UserController() {
+    }
 
     @Inject
     public UserController(UserService userService) {
@@ -36,6 +33,7 @@ public class UserController {
                         .email(user.getEmail())
                         .name(user.getName())
                         .hasAvatar(user.getAvatar() != null)
+                        .recipes(user.getRecipes())
                         .build())
                 .orElseThrow();
     }
@@ -48,6 +46,7 @@ public class UserController {
                         .email(user.getEmail())
                         .name(user.getName())
                         .hasAvatar(user.getAvatar() != null)
+                        .recipes(user.getRecipes())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -65,8 +64,7 @@ public class UserController {
     }
 
 
-
-    public byte[] getAvatar(UUID id) {
+    public Path getAvatar(UUID id) throws IOException {
         return userService.getAvatar(id);
     }
 

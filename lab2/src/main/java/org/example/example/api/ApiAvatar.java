@@ -1,7 +1,6 @@
 package org.example.example.api;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.ServletConfig;
@@ -12,7 +11,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.example.controller.UserController;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 @WebServlet("/api/user/avatar/*")
@@ -40,17 +43,21 @@ public class ApiAvatar extends HttpServlet {
         if (path != null && !path.isEmpty()) {
             try {
                 UUID id = UUID.fromString(path);
-                byte[] file = userController.getAvatar(id);
-                
+                Path file = userController.getAvatar(id);
+
                 if (file == null) {
                     resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     resp.setContentType("application/json");
                     resp.getWriter().write("User does not have an avatar");
                 } else {
                     resp.setContentType("image/png");
+
+                    InputStream is = Files.newInputStream(file);
+                    is.transferTo(resp.getOutputStream());
+
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.setContentLength(file.length);
-                    resp.getOutputStream().write(file);
+//                    resp.setContentLength(file.length);
+//                    resp.getOutputStream().write(file);
                 }
             } catch (IllegalArgumentException e) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -60,13 +67,12 @@ public class ApiAvatar extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 resp.setContentType("application/json");
                 resp.getWriter().write("ERROR: user not found");
-            } 
-        }
-        else {
+            }
+        } else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.setContentType("application/json");
             resp.getWriter().write("ERROR: invalid UUID in path");
-        }        
+        }
     }
 
     @Override
@@ -75,7 +81,7 @@ public class ApiAvatar extends HttpServlet {
 
         resp.setContentType("application/json");
         String path = getUUIDFromPath(req);
-        
+
         if (path == null || path.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("ERROR: invalid UUID in path");
@@ -84,7 +90,7 @@ public class ApiAvatar extends HttpServlet {
 
         try {
             UUID id = UUID.fromString(path);
-            
+
             if (req.getPart("avatar") == null) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().write("ERROR: avatar file is required");
@@ -105,10 +111,10 @@ public class ApiAvatar extends HttpServlet {
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         resp.setContentType("application/json");
         String path = getUUIDFromPath(req);
-        
+
         if (path == null || path.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("ERROR: invalid UUID in path");
@@ -117,13 +123,13 @@ public class ApiAvatar extends HttpServlet {
 
         try {
             UUID id = UUID.fromString(path);
-            
+
             if (req.getPart("avatar") == null) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().write("ERROR: avatar file is required");
                 return;
             }
-            
+
             id = userController.setAvatar(id, req.getPart("avatar").getInputStream());
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write(jsonb.toJson(id));
@@ -136,20 +142,19 @@ public class ApiAvatar extends HttpServlet {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         resp.setContentType("application/json");
-        
+
         try {
             UUID id = UUID.fromString(getUUIDFromPath(req));
             userController.deleteAvatar(id);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("Avatar deleted successfully");
-        }catch (Exception e) {
+        } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("ERROR: user not found or avatar deletion failed");
         }
     }
-
 
 
     private String getUUIDFromPath(HttpServletRequest req) {
