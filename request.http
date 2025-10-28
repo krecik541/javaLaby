@@ -1,0 +1,46 @@
+### get all users
+GET localhost:9080/lab1/api/user/
+
+### get user by id
+#@id=f01b842f-5b6c-4989-aa5f-6a5ad7a544fb
+GET localhost:9080/lab1/api/user/b5a14273-ad55-494d-adf7-b9a9b03381b8
+
+### post
+POST localhost:9080/lab1/api/user/
+Content-Type: application/json
+
+{
+  "name": "123",
+  "email": "123@gmail.com"
+}
+
+### delete
+DELETE localhost:9080/lab1/api/user/dffa4e4c-207d-448e-aad2-d4bc86013f08
+
+### update
+PUT localhost:9080/lab1/api/user/dffa4e4c-207d-448e-aad2-d4bc86013f08
+Content-Type: application/json
+
+{
+  "name": "456",
+  "email": "456@gmail.com"
+}
+
+
+
+#######################
+### get avatar
+GET localhost:9080/lab1/api/user/avatar/928a5d7b-01c3-4cdc-9e32-2865ffc3e1d6
+
+### PUT/POST avatar
+POST localhost:9080/lab1/api/user/avatar/928a5d7b-01c3-4cdc-9e32-2865ffc3e1d6
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="avatar"; filename="maklowicz.png"
+
+< src/main/resources/avatars/maklowicz.png
+--boundary--
+
+### delete avatar
+DELETE localhost:9080/lab1/api/user/avatar/928a5d7b-01c3-4cdc-9e32-2865ffc3e1d6
