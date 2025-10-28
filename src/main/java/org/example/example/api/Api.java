@@ -1,5 +1,6 @@
 package org.example.example.api;
 
+import jakarta.inject.Inject;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.ServletConfig;
@@ -21,10 +22,14 @@ import java.util.UUID;
 public class Api extends HttpServlet {
 
     private final Jsonb jsonb = JsonbBuilder.create();
-    private UserController userController;
+    private final UserController userController;
+
+    @Inject
+    public Api(UserController userController) {
+        this.userController = userController;
+    }
 
     public void init(ServletConfig config) throws ServletException {
-        userController = UserController.getInstance();
         super.init(config);
     }
 
@@ -105,7 +110,6 @@ public class Api extends HttpServlet {
             resp.getWriter().write("ERROR: user not found or deletion failed");
         }
     }
-
 
 
     private String getUUIDFromPath(HttpServletRequest req) {

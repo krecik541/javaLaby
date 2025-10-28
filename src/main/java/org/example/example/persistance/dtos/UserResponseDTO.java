@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -14,4 +15,5 @@ public class UserResponseDTO {
     private String name;
     private String email;
     private boolean hasAvatar = false;
+    private List<UUID> recipes;
 }

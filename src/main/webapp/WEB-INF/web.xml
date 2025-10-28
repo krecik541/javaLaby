@@ -10,8 +10,4 @@
         <param-value>avatars</param-value>
     </context-param>
 
-    <listener>
-        <listener-class>org.example.example.configuration.listener.InitData</listener-class>
-    </listener>
-
 </web-app>

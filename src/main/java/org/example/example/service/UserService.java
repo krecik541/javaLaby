@@ -1,29 +1,37 @@
 package org.example.example.service;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.example.example.persistance.domain.User;
 import org.example.example.persistance.dtos.UserRequestDTO;
 import org.example.example.persistance.repository.UserRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Singleton
 public class UserService {
 
-    private static UserService instance;
-    private final UserRepository userRepository;
+    private static Path path;
+    private UserRepository userRepository;
 
-    private UserService() {
-        userRepository = UserRepository.getInstance();
+    public UserService() {
     }
 
-    public static UserService getInstance() {
-        if (instance == null) {
-            instance = new UserService();
-        }
-        return instance;
+    @Inject
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public static void setPath(Path path) {
+        UserService.path = Path.of(path.toString() + "/");
     }
 
     public Optional<User> findById(UUID id) {
@@ -36,9 +44,10 @@ public class UserService {
 
     public UUID create(UserRequestDTO dto) {
         User user = User.builder()
-                        .name(dto.getName())
-                        .email(dto.getEmail())
-                        .build();
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .recipes(new ArrayList<>())
+                .build();
         validate(userRepository.create(user));
         return user.getId();
     }
@@ -53,7 +62,7 @@ public class UserService {
         if (existingUserOpt.isEmpty()) {
             throw new IllegalArgumentException("User not found");
         }
-        
+
         User existingUser = existingUserOpt.get();
         User user = User.builder()
                 .id(uuid)
@@ -67,12 +76,16 @@ public class UserService {
     }
 
 
-    public byte[] getAvatar(UUID id) {
-        return userRepository.getAvatar(id);
+    public Path getAvatar(UUID id) throws IOException {
+        User user = userRepository.findById(id).orElseThrow(IOException::new);
+        return user.getAvatar();
     }
 
     public UUID setAvatar(UUID id, InputStream inputStream) throws IOException {
-        return userRepository.setAvatar(id, inputStream.readAllBytes());
+        Path path = Paths.get(UserService.path.toString() + id.toString() + ".png");
+        userRepository.setAvatar(id, path);
+        Files.copy(inputStream, path);
+        return id;
     }
 
     public UUID deleteAvatar(UUID id) {

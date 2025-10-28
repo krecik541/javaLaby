@@ -2,6 +2,7 @@ package org.example.example.persistance.domain;
 
 import lombok.*;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,9 +15,9 @@ public class User {
     private UUID id;
     private String name;
     private String email;
-    private byte[] avatar;
+    private Path avatar;
 
-    private List<Recipe> recipes;
+    private List<UUID> recipes;
 
     @Override
     public String toString() {
