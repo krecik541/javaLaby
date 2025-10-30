@@ -1,7 +1,7 @@
 package org.example.example.service;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.example.example.persistance.domain.User;
 import org.example.example.persistance.dtos.UserRequestDTO;
 import org.example.example.persistance.repository.UserRepository;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Singleton
+@ApplicationScoped
 public class UserService {
 
     private static Path path;

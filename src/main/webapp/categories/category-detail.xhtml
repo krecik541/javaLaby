@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <ui:define name="title">Szczegóły kategorii</ui:define>
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{categoryDetailsView.id}" />
+        <f:viewAction action="#{categoryDetailsView.init}" />
+    </f:metadata>
+
+    <ui:define name="content">
+        <h:panelGroup rendered="#{categoryDetailsView.category != null}">
+            <h:panelGrid columns="2">
+                <h:outputText value="Name:" />
+                <h:outputText value="#{categoryDetailsView.category.name}" />
+                <h:outputText value="Type:" />
+                <h:outputText value="#{categoryDetailsView.category.type}" />
+            </h:panelGrid>
+
+            <h:form>
+                <h:commandButton value="Delete category" action="#{categoryDetailsView.deleteCategory(categoryDetailsView.id)}"/>
+            </h:form>
+
+            <h:form>
+                <h:link outcome="/recipes/recipe-form.xhtml" value="Add recipe">
+                    <f:param name="categoryId" value="#{categoryDetailsView.id}" />
+                </h:link>
+            </h:form>
+        </h:panelGroup>
+        
+        <h:panelGroup rendered="#{categoryDetailsView.category == null}">
+            <h2>Category not found</h2>
+            <h:link outcome="/categories/categories.xhtml" value="Back to categories list" />
+        </h:panelGroup>
+
+        <h3>Recipes</h3>
+        <h:form>
+            <h:inputHidden id="categoryId" value="#{categoryDetailsView.id}" />
+            <h:dataTable value="#{categoryDetailsView.recipes}" var="recipe">
+                <h:column>
+                    <f:facet name="header">Title</f:facet> #{recipe.title}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">View</f:facet>
+                    <h:link outcome="/recipes/recipe-detail.xhtml">
+                        <f:param name="id" value="#{recipe.id}" /> View
+                    </h:link>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Edit</f:facet>
+                    <h:link outcome="/recipes/recipe-form.xhtml">
+                        <f:param name="id" value="#{recipe.id}" /> Edit
+                    </h:link>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Actions</f:facet>
+                    <h:commandButton value="Delete" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" />
+                </h:column>
+            </h:dataTable>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,7 +1,7 @@
 package org.example.example.service;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.dtos.CategoryRequestDTO;
 import org.example.example.persistance.repository.CategoryRepository;
@@ -11,17 +11,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Singleton
+@ApplicationScoped
 public class CategoryService {
 
     private CategoryRepository categoryRepository;
+    private RecipeService recipeService;
 
     public CategoryService() {
     }
 
     @Inject
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, RecipeService recipeService) {
         this.categoryRepository = categoryRepository;
+        this.recipeService = recipeService;
     }
 
     public Optional<Category> findById(UUID id) {
@@ -29,7 +31,9 @@ public class CategoryService {
     }
 
     public List<Category> findAll() {
-        return categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll();
+        System.out.println("CategoryService.findAll() found " + categories.size() + " categories");
+        return categories;
     }
 
     public UUID create(CategoryRequestDTO dto) {
@@ -43,9 +47,29 @@ public class CategoryService {
     }
 
     public UUID delete(UUID id) {
-        validate(categoryRepository.delete(id));
-        return id;
+        Optional<Category> categoryOpt = findById(id);
+        if (categoryOpt.isPresent()) {
+            // delete all recipes that belong to this category
+            Category category = categoryOpt.get();
+            if (category.getRecipes() != null) {
+                // iterate over a copy to avoid ConcurrentModification
+                List<UUID> toDelete = new ArrayList<>(category.getRecipes());
+                for (UUID recipeId : toDelete) {
+                    // delegate deletion to RecipeService to handle updates to authors/categories
+                    try {
+                        recipeService.delete(recipeId);
+                    } catch (Exception e) {
+                        // swallow exceptions per-delete to attempt best-effort cleanup
+                    }
+                }
+            }
+
+            categoryRepository.delete(id);
+            return id;
+        }
+        return null;
     }
+
 
     public UUID update(UUID uuid, CategoryRequestDTO dto) {
         Optional<Category> existingCategoryOpt = categoryRepository.findById(uuid);
@@ -62,6 +86,12 @@ public class CategoryService {
                 .build();
         validate(categoryRepository.update(uuid, category));
         return uuid;
+    }
+
+    public int countRecipesByCategory(UUID id) {
+        Optional<Category> cc = findById(id);
+        Category c = cc.get();
+        return c != null && c.getRecipes() != null ? c.getRecipes().size() : 0;
     }
 
     private void validate(UUID id) {

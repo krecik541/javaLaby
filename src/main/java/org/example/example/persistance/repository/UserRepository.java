@@ -1,13 +1,13 @@
 package org.example.example.persistance.repository;
 
-import jakarta.inject.Singleton;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.example.example.persistance.domain.User;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-@Singleton
+@ApplicationScoped
 public class UserRepository implements Repository<User, UUID> {
 
     private final Map<UUID, User> users;

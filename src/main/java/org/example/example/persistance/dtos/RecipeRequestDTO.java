@@ -9,6 +9,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class RecipeRequestDTO {
     private String title;
     private String description;

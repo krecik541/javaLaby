@@ -1,11 +1,11 @@
 package org.example.example.persistance.repository;
 
-import jakarta.inject.Singleton;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.example.example.persistance.domain.Recipe;
 
 import java.util.*;
 
-@Singleton
+@ApplicationScoped
 public class RecipeRepository implements Repository<Recipe, UUID> {
 
     private final Map<UUID, Recipe> recipes;
@@ -49,5 +49,14 @@ public class RecipeRepository implements Repository<Recipe, UUID> {
             return id;
         }
         return null;
+    }
+
+    public void deleteByCategory(UUID id) {
+        for(Map.Entry<UUID, Recipe> recipe : recipes.entrySet()) {
+            Recipe r = recipe.getValue();
+            if(r.getCategory() == id) {
+                recipes.remove(recipe.getKey());
+            }
+        }
     }
 }

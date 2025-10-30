@@ -1,7 +1,7 @@
 package org.example.example.service;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.domain.User;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Singleton
+@ApplicationScoped
 public class RecipeService {
 
     private RecipeRepository recipeRepository;
@@ -106,5 +106,9 @@ public class RecipeService {
                 .build();
         recipeRepository.update(uuid, user);
         return uuid;
+    }
+
+    public void deleteByCategory(UUID id) {
+        recipeRepository.deleteByCategory(id);
     }
 }

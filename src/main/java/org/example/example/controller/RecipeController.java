@@ -2,6 +2,7 @@ package org.example.example.controller;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.dtos.RecipeRequestDTO;
 import org.example.example.persistance.dtos.RecipeResponseDTO;
 import org.example.example.service.RecipeService;
@@ -23,18 +24,19 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    public RecipeResponseDTO findById(UUID id) {
-        return recipeService.findById(id)
-                .map(recipe -> RecipeResponseDTO.builder()
-                        .id(recipe.getId())
-                        .author(recipe.getAuthor())
-                        .category(recipe.getCategory())
-                        .dateOfAddition(recipe.getDateOfAddition())
-                        .description(recipe.getDescription())
-                        .preparationTime(recipe.getPreparationTime())
-                        .title(recipe.getTitle())
-                        .build())
-                .orElseThrow();
+    public Recipe findById(UUID id) {
+        return recipeService.findById(id).orElse(null);
+//                .findById(id)
+//                .map(recipe -> RecipeResponseDTO.builder()
+//                        .id(recipe.getId())
+//                        .author(recipe.getAuthor())
+//                        .category(recipe.getCategory())
+//                        .dateOfAddition(recipe.getDateOfAddition())
+//                        .description(recipe.getDescription())
+//                        .preparationTime(recipe.getPreparationTime())
+//                        .title(recipe.getTitle())
+//                        .build())
+//                .orElseThrow();
     }
 
     public List<RecipeResponseDTO> findAll() {
@@ -64,4 +66,20 @@ public class RecipeController {
         return recipeService.update(id, recipe);
     }
 
+    public void deleteByCategory(UUID id) {
+        recipeService.deleteByCategory(id);
+    }
+
+    public List<RecipeResponseDTO> findByCategory(String id) {
+        List<RecipeResponseDTO> r = recipeService.findAll().stream().filter(recipe -> recipe.getCategory().toString().equals(id)) .map(recipe -> RecipeResponseDTO.builder()
+                .id(recipe.getId())
+                .author(recipe.getAuthor())
+                .category(recipe.getCategory())
+                .dateOfAddition(recipe.getDateOfAddition())
+                .description(recipe.getDescription())
+                .preparationTime(recipe.getPreparationTime())
+                .title(recipe.getTitle())
+                .build()).toList();
+        return r;
+    }
 }

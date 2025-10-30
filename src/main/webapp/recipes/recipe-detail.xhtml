@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{recipeDetailsView.id}" />
+        <f:viewAction action="#{recipeDetailsView.init}" />
+    </f:metadata>
+
+    <ui:define name="content">
+        <h2>Recipe details</h2>
+
+        <h:panelGrid columns="2">
+            <h:outputText value="Title:" />
+            <h:outputText value="#{recipeDetailsView.recipe.title}" />
+            <h:outputText value="Category:" />
+            <h:panelGroup>
+                <h:outputText rendered="#{not empty recipeDetailsView.recipe.category}" value="" />
+                <h:link outcome="/categories/category-detail.xhtml"
+                        rendered="#{not empty recipeDetailsView.recipe.category}">
+                    <f:param name="id" value="#{recipeDetailsView.recipe.category}" />
+                    #{recipeDetailsView.getCategoryName(recipeDetailsView.recipe.category)}
+                </h:link>
+                <h:outputText rendered="#{empty recipeDetailsView.recipe.category}" value="-" />
+            </h:panelGroup>
+            <h:outputText value="Description:" />
+            <h:outputText value="#{recipeDetailsView.recipe.description}" />
+            <h:outputText value="Preparation time:" />
+            <h:outputText value="#{recipeDetailsView.recipe.preparationTime}" />
+            <h:outputText value="Date of addition:" />
+            <h:outputText value="#{recipeDetailsView.recipe.dateOfAddition}" />
+<!--            <h:outputText value="Author:" />-->
+<!--            <h:panelGroup>-->
+<!--                <h:outputText rendered="#{not empty recipeDetailsView.recipe.author}" value="#{recipeDetailsView.recipe.author.name}" />-->
+<!--                <h:outputText rendered="#{empty recipeDetailsView.recipe.artist}" value="-" />-->
+<!--            </h:panelGroup>-->
+        </h:panelGrid>
+
+    </ui:define>
+</ui:composition>

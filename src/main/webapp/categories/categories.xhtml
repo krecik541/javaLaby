@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <ui:define name="content">
+
+        <h2>Lista kategorii</h2>
+        
+        <h:form>
+            <h:outputText value="Debug info: #{not empty categoryView.categories ? categoryView.categories.size() : 'No categories'} categories found" />
+
+            <h:dataTable value="#{categoryView.categories}" var="cat" border="1">
+
+                <h:column>
+                    <f:facet name = "header">Name</f:facet> #{cat.name}
+                </h:column>
+                <h:column>
+                    <f:facet name = "header">Type</f:facet> #{cat.type}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Actions</f:facet>
+                    <h:link outcome="/categories/category-detail.xhtml" value="View">
+                        <f:param name="id" value="#{cat.id}"/>
+                    </h:link>
+                    &#160;
+                    <h:commandButton value="Delete" action="#{categoryView.delete(cat.id)}"/>
+                </h:column>
+            </h:dataTable>
+        </h:form>
+
+
+    </ui:define>
+
+</ui:composition>

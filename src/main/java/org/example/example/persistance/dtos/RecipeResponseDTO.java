@@ -3,6 +3,8 @@ package org.example.example.persistance.dtos;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.example.example.persistance.domain.Recipe;
 
 import java.util.Date;
 import java.util.UUID;
@@ -10,6 +12,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@ToString
 public class RecipeResponseDTO {
     private UUID id;
     private String title;
@@ -19,4 +22,13 @@ public class RecipeResponseDTO {
 
     private UUID author;
     private UUID category;
+
+    public String getAuthor() {
+        return author.toString();
+    }
+
+    public String getCategory() {
+        return category.toString();
+    }
+
 }

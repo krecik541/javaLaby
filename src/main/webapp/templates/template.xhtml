@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:f="jakarta.faces.core">
+    <f:view>
+        <h:head>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <title><ui:insert name="title">Aplikacja Przepisów Kulinarnych</ui:insert></title>
+            <h:outputStylesheet name="css/style.css"/>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+        </h:head>
+
+        <h:body>
+            <div class="container">
+                <header class="header">
+                    <div class="header-content">
+                        <div class="logo">
+                            <i class="fas fa-utensils"></i>
+                            <h1>Przepisy Kulinarne</h1>
+                        </div>
+                        <nav class="navigation">
+                            <ul>
+                                <li><a href="/lab3/index.xhtml" class="nav-link">Home</a></li>
+                                <li><a href="/lab3/categories/categories.xhtml" class="nav-link">Kategorie</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </header>
+
+                <main class="main-content">
+                    <ui:insert name="content">
+                        <p>Zawartość strony</p>
+                    </ui:insert>
+                </main>
+
+                <footer class="footer">
+                    <div class="footer-content">
+                        <p>2025 Aplikacja Przepisów Kulinarnych. Wszystkie prawa zastrzeżone.</p>
+                    </div>
+                </footer>
+            </div>
+
+        </h:body>
+    </f:view>
+</html>
