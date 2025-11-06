@@ -27,7 +27,8 @@ public class RecipeDetailsView implements Serializable {
     private RecipeResponseDTO recipe;
     private CategoryResponseDTO category;
 
-    public RecipeDetailsView() {}
+    public RecipeDetailsView() {
+    }
 
     @Inject
     public RecipeDetailsView(RecipeController recipeController, CategoryController categoryController) {
@@ -47,9 +48,7 @@ public class RecipeDetailsView implements Serializable {
                     .author(r.getAuthor())
                     .category(r.getCategory())
                     .build();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        } catch (Exception ignored) {}
     }
 
     public String getCategoryName(String categoryId) {

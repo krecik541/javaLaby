@@ -36,7 +36,7 @@ public class CategoryController {
                         .type(category.getType())
                         .recipes(category.getRecipes())
                         .build())
-                .orElseThrow();
+                .orElse(null);
     }
 
     public List<CategoryResponseDTO> findAll() {

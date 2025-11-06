@@ -37,31 +37,33 @@
             <h:link outcome="/categories/categories.xhtml" value="Back to categories list" />
         </h:panelGroup>
 
-        <h3>Recipes</h3>
-        <h:form>
-            <h:inputHidden id="categoryId" value="#{categoryDetailsView.id}" />
-            <h:dataTable value="#{categoryDetailsView.recipes}" var="recipe">
-                <h:column>
-                    <f:facet name="header">Title</f:facet> #{recipe.title}
-                </h:column>
-                <h:column>
-                    <f:facet name="header">View</f:facet>
-                    <h:link outcome="/recipes/recipe-detail.xhtml">
-                        <f:param name="id" value="#{recipe.id}" /> View
-                    </h:link>
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Edit</f:facet>
-                    <h:link outcome="/recipes/recipe-form.xhtml">
-                        <f:param name="id" value="#{recipe.id}" /> Edit
-                    </h:link>
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Actions</f:facet>
-                    <h:commandButton value="Delete" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" />
-                </h:column>
-            </h:dataTable>
-        </h:form>
+        <h:panelGroup rendered="#{categoryDetailsView.category != null}">
+            <h3>Recipes</h3>
+            <h:form>
+                <h:inputHidden id="categoryId" value="#{categoryDetailsView.id}" />
+                <h:dataTable value="#{categoryDetailsView.recipes}" var="recipe">
+                    <h:column>
+                        <f:facet name="header">Title</f:facet> #{recipe.title}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">View</f:facet>
+                        <h:link outcome="/recipes/recipe-detail.xhtml">
+                            <f:param name="id" value="#{recipe.id}" /> View
+                        </h:link>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Edit</f:facet>
+                        <h:link outcome="/recipes/recipe-form.xhtml">
+                            <f:param name="id" value="#{recipe.id}" /> Edit
+                        </h:link>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Actions</f:facet>
+                        <h:commandButton value="Delete" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" />
+                    </h:column>
+                </h:dataTable>
+            </h:form>
+        </h:panelGroup>
 
     </ui:define>
 

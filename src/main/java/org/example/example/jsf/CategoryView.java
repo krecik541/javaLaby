@@ -50,6 +50,6 @@ public class CategoryView implements Serializable {
             throw new RuntimeException(e);
         }
 
-        return null;
+        return "/categories/categories.xhtml?faces-redirect=true";
     }
 }

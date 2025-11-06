@@ -37,30 +37,10 @@ public class CategoryDetailsView implements Serializable {
 
     public void init() {
         if (id != null && !id.isBlank()) {
-            try {
-                UUID uuid = UUID.fromString(id);
-                CategoryResponseDTO foundCategory = categoryController.findById(uuid);
-                if (foundCategory != null) {
-                    this.category = foundCategory;
-                } else {
-                    // Redirect to categories list if category not found
-                    try {
-                        FacesContext.getCurrentInstance()
-                            .getExternalContext()
-                            .redirect("/categories/categories.xhtml");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (IllegalArgumentException e) {
-                // Handle invalid UUID format
-                try {
-                    FacesContext.getCurrentInstance()
-                        .getExternalContext()
-                        .redirect("/categories/categories.xhtml");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+            UUID uuid = UUID.fromString(id);
+            CategoryResponseDTO foundCategory = categoryController.findById(uuid);
+            if (foundCategory != null) {
+                this.category = foundCategory;
             }
         }
     }
@@ -72,11 +52,13 @@ public class CategoryDetailsView implements Serializable {
         return recipeController.findByCategory(id);
     }
 
-    public void deleteRecipe(String recipeToDelete) {
+    public String deleteRecipe(String recipeToDelete) {
         recipeController.delete(UUID.fromString(recipeToDelete));
+        return "/categories/categories.xhtml?faces-redirect=true";
     }
 
-    public void deleteCategory(String id) {
+    public String deleteCategory(String id) {
         categoryController.delete(UUID.fromString(id));
+        return "/categories/categories.xhtml?faces-redirect=true";
     }
 }

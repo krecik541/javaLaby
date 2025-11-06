@@ -11,9 +11,10 @@
     </f:metadata>
 
     <ui:define name="content">
-        <h2>Recipe details</h2>
 
-        <h:panelGrid columns="2">
+        <h:panelGrid rendered="#{recipeDetailsView.recipe != null}" columns="2">
+            <h2>Recipe details</h2>
+
             <h:outputText value="Title:" />
             <h:outputText value="#{recipeDetailsView.recipe.title}" />
             <h:outputText value="Category:" />
@@ -38,6 +39,11 @@
 <!--                <h:outputText rendered="#{empty recipeDetailsView.recipe.artist}" value="-" />-->
 <!--            </h:panelGroup>-->
         </h:panelGrid>
+
+        <h:panelGroup rendered="#{recipeDetailsView.recipe == null}">
+            <h2>Category not found</h2>
+            <h:link outcome="/index.xhtml" value="Back to home" />
+        </h:panelGroup>
 
     </ui:define>
 </ui:composition>
