@@ -1,0 +1,64 @@
+@id_category=ffe23653-a42c-48c4-89a0-e26dd2f9b665
+
+@id_recipe=c2637d96-3114-4f98-901c-363eb217c37f
+
+### Get all categories
+GET http://localhost:9080/lab4/api/categories
+
+### Get category by id
+GET http://localhost:9080/lab4/api/categories/{{id_category}}
+
+### Create category
+POST http://localhost:9080/lab4/api/categories
+Content-Type: application/json
+
+{
+  "name": "123",
+  "type": "LUNCH"
+}
+
+### Update category
+PUT http://localhost:9080/lab4/api/categories/{{id_category}}
+Content-Type: application/json
+
+{
+  "type": "BREAKFAST"
+}
+
+### Delete category
+DELETE http://localhost:9080/lab4/api/categories/{{id_category}}
+
+
+
+
+### Get all recipes
+GET http://localhost:9080/lab4/api/1/recipes
+
+### Get all recipes (by category)
+GET http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes
+
+### Get specific recipe form specific category
+GET http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes/{{id_recipe}}
+
+### Create recipe in category
+POST http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes
+Content-Type: application/json
+
+{
+  "title": "abc",
+  "description": "def",
+  "preparationTime": "1000"
+}
+
+### Update recipe
+PUT http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes/{{id_recipe}}
+Content-Type: application/json
+
+{
+  "title": "test",
+  "description": "updated",
+  "preparationTime": "5000"
+}
+
+### Delete recipe
+DELETE http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes/{{id_recipe}}
