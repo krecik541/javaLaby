@@ -12,23 +12,24 @@ import org.example.example.persistance.dtos.CategoryResponseDTO;
 import java.util.List;
 import java.util.UUID;
 
-@Path("/categories")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequestScoped
+@Path("")
 public class CategoryRESTApi {
 
     @Inject
     CategoryController categoryController;
 
     @GET
+    @Path("/categories")
     public Response listAll() {
         List<CategoryResponseDTO> all = categoryController.findAll();
         return Response.ok(all).build();
     }
 
     @GET
-    @Path("{id}")
+    @Path("/categories/{id}")
     public Response getById(@PathParam("id") String id) {
         try {
             UUID uuid = UUID.fromString(id);
@@ -43,6 +44,7 @@ public class CategoryRESTApi {
     }
 
     @POST
+    @Path("/categories")
     public Response create(CategoryRequestDTO request) {
         try {
             UUID id = categoryController.create(request);
@@ -53,7 +55,7 @@ public class CategoryRESTApi {
     }
 
     @PUT
-    @Path("{id}")
+    @Path("/categories/{id}")
     public Response update(@PathParam("id") String id, CategoryRequestDTO request) {
         try {
             UUID uuid = UUID.fromString(id);
@@ -67,7 +69,7 @@ public class CategoryRESTApi {
     }
 
     @DELETE
-    @Path("{id}")
+    @Path("/categories/{id}")
     public Response delete(@PathParam("id") String id) {
         try {
             UUID uuid = UUID.fromString(id);

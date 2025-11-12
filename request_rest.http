@@ -1,6 +1,6 @@
-@id_category=ffe23653-a42c-48c4-89a0-e26dd2f9b665
+@id_category=36ff7412-4b0e-4e3e-b652-01c3f1118c5e
 
-@id_recipe=c2637d96-3114-4f98-901c-363eb217c37f
+@id_recipe=6ae72174-d7f3-4f73-be12-ac7e64b1611e
 
 ### Get all categories
 GET http://localhost:9080/lab4/api/categories
@@ -32,16 +32,16 @@ DELETE http://localhost:9080/lab4/api/categories/{{id_category}}
 
 
 ### Get all recipes
-GET http://localhost:9080/lab4/api/1/recipes
+GET http://localhost:9080/lab4/api/recipes
 
 ### Get all recipes (by category)
-GET http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes
+GET http://localhost:9080/lab4/api/categories/{{id_category}}/recipes
 
 ### Get specific recipe form specific category
-GET http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes/{{id_recipe}}
+GET http://localhost:9080/lab4/api/categories/{{id_category}}/recipes/{{id_recipe}}
 
 ### Create recipe in category
-POST http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes
+POST http://localhost:9080/lab4/api/categories/{{id_category}}/recipes
 Content-Type: application/json
 
 {
@@ -51,7 +51,7 @@ Content-Type: application/json
 }
 
 ### Update recipe
-PUT http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes/{{id_recipe}}
+PUT http://localhost:9080/lab4/api/categories/{{id_category}}/recipes/{{id_recipe}}
 Content-Type: application/json
 
 {
@@ -61,4 +61,4 @@ Content-Type: application/json
 }
 
 ### Delete recipe
-DELETE http://localhost:9080/lab4/api/1/categories/{{id_category}}/recipes/{{id_recipe}}
+DELETE http://localhost:9080/lab4/api/categories/{{id_category}}/recipes/{{id_recipe}}

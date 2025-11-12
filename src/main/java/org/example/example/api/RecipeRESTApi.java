@@ -6,8 +6,10 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.example.example.controller.RecipeController;
+import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.dtos.RecipeRequestDTO;
 import org.example.example.persistance.dtos.RecipeResponseDTO;
+import org.example.example.persistance.dtos.RecipeRestDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,28 +17,28 @@ import java.util.UUID;
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Path("1")
+@Path("")
 public class RecipeRESTApi {
 
     @Inject
     RecipeController recipeController;
 
-    // List all recipes (global)
     @GET
     @Path("/recipes")
     public Response listAll() {
         List<RecipeResponseDTO> all = recipeController.findAll();
-        return Response.ok(all).build();
+        List<RecipeRestDTO> converted = all.stream().map(Converter::convert).toList();
+        return Response.ok(converted).build();
     }
 
-    // Hierarchical: list recipes in a category
     @GET
     @Path("/categories/{categoryId}/recipes")
     public Response listByCategory(@PathParam("categoryId") String categoryId) {
         try {
             UUID cid = UUID.fromString(categoryId);
             List<RecipeResponseDTO> byCat = recipeController.findByCategory(cid.toString());
-            return Response.ok(byCat).build();
+            List<RecipeRestDTO> all = byCat.stream().map(Converter::convert).toList();
+            return Response.ok(all).build();
         } catch (IllegalArgumentException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid category id").build();
         }
@@ -49,14 +51,14 @@ public class RecipeRESTApi {
             UUID cid = UUID.fromString(categoryId);
             UUID rid = UUID.fromString(recipeId);
             // retrieve recipe and ensure it belongs to category
-            var recipe = recipeController.findById(rid);
+            Recipe recipe = recipeController.findById(rid);
             if (recipe == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Recipe not found").build();
             }
             if (recipe.getCategory() == null || !recipe.getCategory().equals(cid)) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Recipe not found in this category").build();
             }
-            return Response.ok(recipe).build();
+            return Response.ok(Converter.convert(recipe)).build();
         } catch (IllegalArgumentException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid UUID").build();
         }
@@ -111,6 +113,26 @@ public class RecipeRESTApi {
     }
 
     static class Converter {
+        public static RecipeRestDTO convert(RecipeResponseDTO recipe) {
+            return RecipeRestDTO.builder()
+                    .id(recipe.getId())
+                    .title(recipe.getTitle())
+                    .description(recipe.getDescription())
+                    .preparationTime(recipe.getPreparationTime())
+                    .dateOfAddition(recipe.getDateOfAddition())
+                    .category(UUID.fromString(recipe.getCategory()))
+                    .build();
+        }
 
+        public static RecipeRestDTO convert(Recipe recipe) {
+            return RecipeRestDTO.builder()
+                    .id(recipe.getId())
+                    .title(recipe.getTitle())
+                    .description(recipe.getDescription())
+                    .preparationTime(recipe.getPreparationTime())
+                    .dateOfAddition(recipe.getDateOfAddition())
+                    .category(recipe.getCategory())
+                    .build();
+        }
     }
 }
