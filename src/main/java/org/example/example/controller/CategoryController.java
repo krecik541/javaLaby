@@ -34,7 +34,7 @@ public class CategoryController {
                         .id(category.getId())
                         .name(category.getName())
                         .type(category.getType())
-                        .recipes(category.getRecipes())
+                        .recipes(category.getRecipes().stream().map(Recipe::getId).toList())
                         .build())
                 .orElse(null);
     }
@@ -47,7 +47,7 @@ public class CategoryController {
                         .id(category.getId())
                         .name(category.getName())
                         .type(category.getType())
-                        .recipes(category.getRecipes())
+                        .recipes(category.getRecipes().stream().map(Recipe::getId).toList())
                         .build())
                 .collect(Collectors.toList());
         System.out.println("CategoryController.findAll() returning " + dtos.size() + " DTOs");

@@ -1,70 +1,64 @@
 package org.example.example.persistance.repository;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.CategoryType;
+import org.example.example.persistance.domain.Recipe;
 
 import java.util.*;
 
 @ApplicationScoped
 public class CategoryRepository implements Repository<Category, UUID> {
 
-    private final Map<UUID, Category> categories;
+    private EntityManager em;
 
-    public CategoryRepository() {
-        categories = new HashMap<>();
-        // Add some sample data
-        Category breakfast = Category.builder()
-                .name("Śniadania")
-                .type(CategoryType.BREAKFAST)
-                .recipes(new ArrayList<>())
-                .build();
-        Category dinner = Category.builder()
-                .name("Obiady")
-                .type(CategoryType.DINNER)
-                .recipes(new ArrayList<>())
-                .build();
-        create(breakfast);
-        create(dinner);
-        System.out.println("CategoryRepository initialized with " + categories.size() + " sample categories");
+    @PersistenceContext(unitName = "foodPU")
+    public void setEm(EntityManager em) {
+        this.em = em;
     }
 
     @Override
     public Optional<Category> findById(UUID id) {
-        Category category = categories.get(id);
-        if (category != null)
-            return Optional.of(category);
-        return Optional.empty();
+        return Optional.ofNullable(em.find(Category.class, id));
     }
 
     @Override
     public List<Category> findAll() {
-        List<Category> result = categories.values()
-                .stream()
-                .toList();
-        System.out.println("CategoryRepository.findAll() returning " + result.size() + " categories");
-        return result;
+        return em.createQuery("SELECT c FROM Category c", Category.class).getResultList();
     }
 
     @Override
+    @Transactional
     public UUID create(Category category) {
-        UUID id = UUID.randomUUID();
-        category.setId(id);
-        categories.put(id, category);
+        if(category == null)
+            return  null;
+        em.persist(category);
+
+        return category.getId();
+    }
+
+    @Override
+    @Transactional
+    public UUID delete(UUID id) {
+        Optional<Category> c = findById(id);
+        if(c.isEmpty())
+            return null;
+
+        em.remove(c.get());
         return id;
     }
 
     @Override
-    public UUID delete(UUID id) {
-        return categories.remove(id) != null ? id : null;
-    }
-
-    @Override
+    @Transactional
     public UUID update(UUID id, Category category) {
-        if (categories.containsKey(id)) {
-            categories.put(id, category);
-            return id;
-        }
-        return null;
+        Optional<Category> c = findById(id);
+        if(c.isEmpty())
+            return null;
+
+        em.merge(category);
+        return id;
     }
 }

@@ -2,6 +2,7 @@ package org.example.example.service;
 
 import jakarta.inject.Inject;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.domain.User;
@@ -38,6 +39,7 @@ public class RecipeService {
         return recipeRepository.findAll();
     }
 
+    @Transactional
     public UUID create(RecipeRequestDTO dto) {
         Recipe recipe = Recipe.builder()
                 .title(dto.getTitle())
@@ -46,14 +48,14 @@ public class RecipeService {
                 .dateOfAddition(java.sql.Date.valueOf(LocalDate.now()))
 
                 .author(dto.getAuthor())
-                .category(dto.getCategory())
+                .category(categoryService.findById(dto.getCategory()).get())
                 .build();
         recipeRepository.create(recipe);
 
         if (recipe.getCategory() != null) {
-            Category category = categoryService.findById(recipe.getCategory()).orElse(null);
+            Category category = categoryService.findById(recipe.getCategory().getId()).orElse(null);
             if (category != null) {
-                category.getRecipes().add(recipe.getId());
+                category.getRecipes().add(recipeRepository.findById(recipe.getId()).get());
             }
         }
 
@@ -67,11 +69,12 @@ public class RecipeService {
         return recipe.getId();
     }
 
+    @Transactional
     public UUID delete(UUID id) {
         Recipe recipe = recipeRepository.findById(id).orElseThrow();
 
         if (recipe.getCategory() != null) {
-            Category category = categoryService.findById(recipe.getCategory()).orElse(null);
+            Category category = categoryService.findById(recipe.getCategory().getId()).orElse(null);
             if (category != null) {
                 category.getRecipes().remove(recipe.getId());
             }
@@ -88,6 +91,7 @@ public class RecipeService {
         return id;
     }
 
+    @Transactional
     public UUID update(UUID uuid, RecipeRequestDTO dto) {
         Optional<Recipe> existingRecipeOpt = recipeRepository.findById(uuid);
         if (existingRecipeOpt.isEmpty()) {
@@ -102,12 +106,13 @@ public class RecipeService {
                 .preparationTime(dto.getPreparationTime())
                 .dateOfAddition(java.sql.Date.valueOf(LocalDate.now()))
                 .author(dto.getAuthor())
-                .category(dto.getCategory())
+                .category(categoryService.findById(dto.getCategory()).get())
                 .build();
         recipeRepository.update(uuid, user);
         return uuid;
     }
 
+    @Transactional
     public void deleteByCategory(UUID id) {
         recipeRepository.deleteByCategory(id);
     }

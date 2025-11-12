@@ -2,7 +2,9 @@ package org.example.example.service;
 
 import jakarta.inject.Inject;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import org.example.example.persistance.domain.Category;
+import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.dtos.CategoryRequestDTO;
 import org.example.example.persistance.repository.CategoryRepository;
 
@@ -36,6 +38,7 @@ public class CategoryService {
         return categories;
     }
 
+    @Transactional
     public UUID create(CategoryRequestDTO dto) {
         Category category = Category.builder()
                 .name(dto.getName())
@@ -46,6 +49,7 @@ public class CategoryService {
         return category.getId();
     }
 
+    @Transactional
     public UUID delete(UUID id) {
         Optional<Category> categoryOpt = findById(id);
         if (categoryOpt.isPresent()) {
@@ -53,7 +57,9 @@ public class CategoryService {
             Category category = categoryOpt.get();
             if (category.getRecipes() != null) {
                 // iterate over a copy to avoid ConcurrentModification
-                List<UUID> toDelete = new ArrayList<>(category.getRecipes());
+                List<UUID> toDelete = category.getRecipes().stream()
+                        .map(Recipe::getId)
+                        .toList();
                 for (UUID recipeId : toDelete) {
                     // delegate deletion to RecipeService to handle updates to authors/categories
                     try {
@@ -71,6 +77,7 @@ public class CategoryService {
     }
 
 
+    @Transactional
     public UUID update(UUID uuid, CategoryRequestDTO dto) {
         Optional<Category> existingCategoryOpt = categoryRepository.findById(uuid);
         if (existingCategoryOpt.isEmpty()) {

@@ -1,6 +1,9 @@
 package org.example.example.persistance.repository;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.example.example.persistance.domain.Recipe;
 
 import java.util.*;
@@ -8,55 +11,61 @@ import java.util.*;
 @ApplicationScoped
 public class RecipeRepository implements Repository<Recipe, UUID> {
 
-    private final Map<UUID, Recipe> recipes;
+    private EntityManager em;
 
-    public RecipeRepository() {
-        this.recipes = new HashMap<>();
+    @PersistenceContext(unitName = "foodPU")
+    public void setEm(EntityManager em) {
+        this.em = em;
     }
 
     @Override
     public Optional<Recipe> findById(UUID id) {
-        Recipe recipe = recipes.get(id);
-        if (recipe != null)
-            return Optional.of(recipe);
-        return Optional.empty();
+        Recipe r = em.find(Recipe.class, id);
+        return Optional.ofNullable(r);
     }
 
     @Override
     public List<Recipe> findAll() {
-        return recipes.values()
-                .stream()
-                .toList();
+        List<Recipe> l = em.createQuery("SELECT r FROM Recipe r", Recipe.class).getResultList();
+        return l;
     }
 
     @Override
+    @Transactional
     public UUID create(Recipe recipe) {
-        UUID id = UUID.randomUUID();
-        recipe.setId(id);
-        recipes.put(id, recipe);
+        if(recipe == null)
+            return  null;
+        em.persist(recipe);
+
+        return recipe.getId();
+    }
+
+    @Override
+    @Transactional
+    public UUID delete(UUID id) {
+        Optional<Recipe> r = findById(id);
+        if(r.isEmpty())
+            return null;
+
+        em.remove(r.get());
         return id;
     }
 
     @Override
-    public UUID delete(UUID id) {
-        return recipes.remove(id) != null ? id : null;
-    }
-
-    @Override
+    @Transactional
     public UUID update(UUID id, Recipe recipe) {
-        if (recipes.containsKey(id)) {
-            recipes.put(id, recipe);
-            return id;
-        }
-        return null;
+        Optional<Recipe> r = findById(id);
+        if(r.isEmpty())
+            return null;
+
+        em.merge(recipe);
+        return id;
     }
 
+    @Transactional
     public void deleteByCategory(UUID id) {
-        for(Map.Entry<UUID, Recipe> recipe : recipes.entrySet()) {
-            Recipe r = recipe.getValue();
-            if(r.getCategory() == id) {
-                recipes.remove(recipe.getKey());
-            }
-        }
+        em.createQuery("delete from Recipe r where r.category.id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
     }
 }

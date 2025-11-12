@@ -1,5 +1,6 @@
 package org.example.example.persistance.domain;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
@@ -11,7 +12,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Entity
+@Table(name = "recipes")
 public class Recipe {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String title;
     private String description;
@@ -19,5 +24,7 @@ public class Recipe {
     private Date dateOfAddition;
 
     private UUID author;
-    private UUID category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
 }

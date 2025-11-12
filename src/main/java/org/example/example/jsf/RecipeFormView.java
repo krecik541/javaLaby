@@ -11,6 +11,7 @@ import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.dtos.CategoryResponseDTO;
 import org.example.example.persistance.dtos.RecipeRequestDTO;
 import org.example.example.persistance.dtos.RecipeResponseDTO;
+import org.example.example.service.CategoryService;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class RecipeFormView implements Serializable {
     private CategoryController categoryController;
     private RecipeController recipeController;
+    private CategoryService categoryService;
 
     public RecipeFormView() {}
 
@@ -32,9 +34,10 @@ public class RecipeFormView implements Serializable {
     private Recipe recipe = new Recipe();
 
     @Inject
-    public RecipeFormView(CategoryController categoryController, RecipeController recipeController) {
+    public RecipeFormView(CategoryController categoryController, RecipeController recipeController, CategoryService categoryService) {
         this.categoryController = categoryController;
         this.recipeController = recipeController;
+        this.categoryService = categoryService;
     }
 
     public void init() {
@@ -54,7 +57,7 @@ public class RecipeFormView implements Serializable {
         } else if (categoryId != null && !categoryId.isBlank()) {
             try {
                 UUID cid = UUID.fromString(categoryId);
-                recipe.setCategory(cid);
+                recipe.setCategory(categoryService.findById(cid).get());
             } catch (IllegalArgumentException ignored) {}
         }
         if (recipe.getDateOfAddition() == null) {
@@ -73,7 +76,7 @@ public class RecipeFormView implements Serializable {
                         .title(recipe.getTitle())
                         .description(recipe.getDescription())
                         .preparationTime(recipe.getPreparationTime())
-                        .category(recipe.getCategory())
+                        .category(recipe.getCategory().getId())
                         .build();
                 UUID uuid = recipeController.create(req);
                 if (uuid != null) {
@@ -85,7 +88,7 @@ public class RecipeFormView implements Serializable {
                         .title(recipe.getTitle())
                         .description(recipe.getDescription())
                         .preparationTime(recipe.getPreparationTime())
-                        .category(recipe.getCategory())
+                        .category(recipe.getCategory().getId())
                         .build();
                 UUID uuid = recipeController.update(rid, req);
                 if (uuid != null) {

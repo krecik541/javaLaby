@@ -45,7 +45,7 @@ public class RecipeController {
                 .map(recipe -> RecipeResponseDTO.builder()
                         .id(recipe.getId())
                         .author(recipe.getAuthor())
-                        .category(recipe.getCategory())
+                        .category(recipe.getCategory().getId())
                         .dateOfAddition(recipe.getDateOfAddition())
                         .description(recipe.getDescription())
                         .preparationTime(recipe.getPreparationTime())
@@ -71,10 +71,15 @@ public class RecipeController {
     }
 
     public List<RecipeResponseDTO> findByCategory(String id) {
-        List<RecipeResponseDTO> r = recipeService.findAll().stream().filter(recipe -> recipe.getCategory().toString().equals(id)) .map(recipe -> RecipeResponseDTO.builder()
+        List<Recipe> rr = recipeService.findAll();
+        rr = rr.stream().filter(recipe -> recipe.getCategory().getId().toString().equals(id)).toList();
+
+        List<RecipeResponseDTO> r = recipeService.findAll().stream()
+                .filter(recipe -> recipe.getCategory().getId().toString().equals(id))
+                .map(recipe -> RecipeResponseDTO.builder()
                 .id(recipe.getId())
                 .author(recipe.getAuthor())
-                .category(recipe.getCategory())
+                .category(recipe.getCategory().getId())
                 .dateOfAddition(recipe.getDateOfAddition())
                 .description(recipe.getDescription())
                 .preparationTime(recipe.getPreparationTime())

@@ -55,7 +55,7 @@ public class RecipeRESTApi {
             if (recipe == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Recipe not found").build();
             }
-            if (recipe.getCategory() == null || !recipe.getCategory().equals(cid)) {
+            if (recipe.getCategory() == null || !recipe.getCategory().getId().equals(cid)) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Recipe not found in this category").build();
             }
             return Response.ok(Converter.convert(recipe)).build();
@@ -131,7 +131,7 @@ public class RecipeRESTApi {
                     .description(recipe.getDescription())
                     .preparationTime(recipe.getPreparationTime())
                     .dateOfAddition(recipe.getDateOfAddition())
-                    .category(recipe.getCategory())
+                    .category(recipe.getCategory().getId())
                     .build();
         }
     }
