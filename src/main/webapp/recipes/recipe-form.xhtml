@@ -57,7 +57,7 @@
                     <div class="input-group">
                         <h:outputLabel for="category" value="Category:" />
                         <h:selectOneMenu id="category" 
-                                       value="#{recipeFormView.recipe.category}" 
+                                       value="#{recipeFormView.recipe.category.id}"
                                        converter="uuidConverter" 
                                        required="true" 
                                        requiredMessage="Category is required"

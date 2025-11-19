@@ -60,8 +60,8 @@ public class CategoryController {
 
     public UUID delete(UUID id) {
         UUID uuid = categoryService.delete(id);
-        if(uuid != null)
-            recipeController.deleteByCategory(uuid);
+//        if(uuid != null)
+//            recipeController.deleteByCategory(uuid);
         return uuid;
     }
 

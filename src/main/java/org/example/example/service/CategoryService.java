@@ -53,23 +53,6 @@ public class CategoryService {
     public UUID delete(UUID id) {
         Optional<Category> categoryOpt = findById(id);
         if (categoryOpt.isPresent()) {
-            // delete all recipes that belong to this category
-            Category category = categoryOpt.get();
-            if (category.getRecipes() != null) {
-                // iterate over a copy to avoid ConcurrentModification
-                List<UUID> toDelete = category.getRecipes().stream()
-                        .map(Recipe::getId)
-                        .toList();
-                for (UUID recipeId : toDelete) {
-                    // delegate deletion to RecipeService to handle updates to authors/categories
-                    try {
-                        recipeService.delete(recipeId);
-                    } catch (Exception e) {
-                        // swallow exceptions per-delete to attempt best-effort cleanup
-                    }
-                }
-            }
-
             categoryRepository.delete(id);
             return id;
         }

@@ -1,6 +1,6 @@
-@id_category=f72bbd45-f8bc-47e1-b209-f8b98a958299
+@id_category=0d99578b-65a2-43e7-a470-544a1ab2740c
 
-@id_recipe=c14e63ef-4055-431a-88b1-434e47e82af2
+@id_recipe=52ae702e-7602-4c6e-a8db-b14a8cabbe28
 
 ### Get all categories
 GET http://localhost:9080/food-blog/api/categories
@@ -45,8 +45,8 @@ POST http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes
 Content-Type: application/json
 
 {
-  "title": "abc",
-  "description": "def",
+  "title": "test",
+  "description": "created",
   "preparationTime": "1000"
 }
 
