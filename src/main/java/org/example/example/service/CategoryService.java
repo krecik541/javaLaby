@@ -1,8 +1,11 @@
 package org.example.example.service;
 
+import jakarta.ejb.EJB;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
+import lombok.NoArgsConstructor;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.dtos.CategoryRequestDTO;
@@ -13,19 +16,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@ApplicationScoped
+@LocalBean
+@Stateless
 public class CategoryService {
 
     private CategoryRepository categoryRepository;
-    private RecipeService recipeService;
 
     public CategoryService() {
     }
 
     @Inject
-    public CategoryService(CategoryRepository categoryRepository, RecipeService recipeService) {
+    public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.recipeService = recipeService;
     }
 
     public Optional<Category> findById(UUID id) {
@@ -38,7 +40,6 @@ public class CategoryService {
         return categories;
     }
 
-    @Transactional
     public UUID create(CategoryRequestDTO dto) {
         Category category = Category.builder()
                 .name(dto.getName())
@@ -49,7 +50,6 @@ public class CategoryService {
         return category.getId();
     }
 
-    @Transactional
     public UUID delete(UUID id) {
         Optional<Category> categoryOpt = findById(id);
         if (categoryOpt.isPresent()) {
@@ -60,7 +60,6 @@ public class CategoryService {
     }
 
 
-    @Transactional
     public UUID update(UUID uuid, CategoryRequestDTO dto) {
         Optional<Category> existingCategoryOpt = categoryRepository.findById(uuid);
         if (existingCategoryOpt.isEmpty()) {
@@ -70,8 +69,8 @@ public class CategoryService {
         Category existingCategory = existingCategoryOpt.get();
         Category category = Category.builder()
                 .id(uuid)
-                .name(dto.getName())
-                .type(dto.getType())
+                .name(dto.getName() != null ? dto.getName() : existingCategory.getName())
+                .type(dto.getType() != null ? dto.getType() : existingCategory.getType())
                 .recipes(existingCategory.getRecipes())
                 .build();
         validate(categoryRepository.update(uuid, category));

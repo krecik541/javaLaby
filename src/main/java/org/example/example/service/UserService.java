@@ -1,7 +1,14 @@
 package org.example.example.service;
 
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
+import lombok.NoArgsConstructor;
+import org.example.example.persistance.domain.Role;
 import org.example.example.persistance.domain.User;
 import org.example.example.persistance.dtos.UserRequestDTO;
 import org.example.example.persistance.repository.UserRepository;
@@ -11,27 +18,24 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-@ApplicationScoped
+@LocalBean
+@Stateless
+@NoArgsConstructor(force = true)
 public class UserService {
 
-    private static Path path;
     private UserRepository userRepository;
 
-    public UserService() {
-    }
+    @Resource(name = "avatarDir")
+    private String avatarDir;
+
+    @Inject
+    private Pbkdf2PasswordHash passwordHash;
 
     @Inject
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    public static void setPath(Path path) {
-        UserService.path = Path.of(path.toString() + "/");
     }
 
     public Optional<User> findById(UUID id) {
@@ -42,11 +46,15 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public UUID create(UserRequestDTO dto) {
+    public UUID create(UserRequestDTO dto, String role) {
         User user = User.builder()
+                .id(UUID.randomUUID())
                 .name(dto.getName())
+                .login(dto.getLogin())
                 .email(dto.getEmail())
+                .password(passwordHash.generate(dto.getPassword().toCharArray()))
                 .recipes(new ArrayList<>())
+                .roles(List.of(role))
                 .build();
         validate(userRepository.create(user));
         return user.getId();
@@ -66,10 +74,13 @@ public class UserService {
         User existingUser = existingUserOpt.get();
         User user = User.builder()
                 .id(uuid)
-                .name(dto.getName())
-                .email(dto.getEmail())
+                .name(dto.getName() != null ? dto.getName() : existingUser.getName())
+                .login(dto.getLogin() != null ? dto.getLogin() : existingUser.getLogin())
+                .email(dto.getEmail() != null ? dto.getEmail() : existingUser.getEmail())
+                .password(existingUser.getPassword())
                 .recipes(existingUser.getRecipes())
                 .avatar(existingUser.getAvatar())
+                .roles(existingUser.getRoles())
                 .build();
         validate(userRepository.update(uuid, user));
         return uuid;
@@ -82,7 +93,7 @@ public class UserService {
     }
 
     public UUID setAvatar(UUID id, InputStream inputStream) throws IOException {
-        Path path = Paths.get(UserService.path.toString() + id.toString() + ".png");
+        Path path = Paths.get(avatarDir + id.toString() + ".png");
         userRepository.setAvatar(id, path);
         Files.copy(inputStream, path);
         return id;
@@ -96,5 +107,9 @@ public class UserService {
         if (id == null) {
             throw new IllegalArgumentException("Operation failed");
         }
+    }
+
+    public Optional<User> findByLogin(String s) {
+        return userRepository.findByLogin(s);
     }
 }

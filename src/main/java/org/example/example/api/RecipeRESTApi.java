@@ -1,12 +1,16 @@
 package org.example.example.api;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.example.example.controller.RecipeController;
 import org.example.example.persistance.domain.Recipe;
+import org.example.example.persistance.domain.Role;
 import org.example.example.persistance.dtos.RecipeRequestDTO;
 import org.example.example.persistance.dtos.RecipeResponseDTO;
 import org.example.example.persistance.dtos.RecipeRestDTO;
@@ -23,20 +27,21 @@ public class RecipeRESTApi {
     @Inject
     RecipeController recipeController;
 
-    @GET
-    @Path("/recipes")
-    public Response listAll() {
-        List<RecipeResponseDTO> all = recipeController.findAll();
-        List<RecipeRestDTO> converted = all.stream().map(Converter::convert).toList();
-        return Response.ok(converted).build();
-    }
+//    @GET
+//    @Path("/category")
+//    @RolesAllowed(Role.ADMIN)
+//    public Response listAll() {
+//        List<RecipeResponseDTO> all = recipeController.find;
+//        List<RecipeRestDTO> converted = all.stream().map(Converter::convert).toList();
+//        return Response.ok(converted).build();
+//    }
 
     @GET
     @Path("/categories/{categoryId}/recipes")
     public Response listByCategory(@PathParam("categoryId") String categoryId) {
         try {
             UUID cid = UUID.fromString(categoryId);
-            List<RecipeResponseDTO> byCat = recipeController.findByCategory(cid.toString());
+            List<RecipeResponseDTO> byCat = recipeController.findAllDtos(cid);
             List<RecipeRestDTO> all = byCat.stream().map(Converter::convert).toList();
             return Response.ok(all).build();
         } catch (IllegalArgumentException ex) {
@@ -66,6 +71,7 @@ public class RecipeRESTApi {
 
     @POST
     @Path("/categories/{categoryId}/recipes")
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Response create(@PathParam("categoryId") String categoryId, RecipeRequestDTO request) {
         try {
             UUID cid = UUID.fromString(categoryId);
@@ -82,6 +88,7 @@ public class RecipeRESTApi {
 
     @PUT
     @Path("/categories/{categoryId}/recipes/{recipeId}")
+    @RolesAllowed(Role.ADMIN)
     public Response update(@PathParam("categoryId") String categoryId, @PathParam("recipeId") String recipeId, RecipeRequestDTO request) {
         try {
             UUID cid = UUID.fromString(categoryId);
@@ -99,6 +106,7 @@ public class RecipeRESTApi {
 
     @DELETE
     @Path("/categories/{categoryId}/recipes/{recipeId}")
+    @RolesAllowed(Role.ADMIN)
     public Response delete(@PathParam("categoryId") String categoryId, @PathParam("recipeId") String recipeId) {
         try {
             UUID rid = UUID.fromString(recipeId);

@@ -1,15 +1,20 @@
 package org.example.example.configuration.listener;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.annotation.security.DeclareRoles;
+import jakarta.annotation.security.RunAs;
+import jakarta.ejb.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Initialized;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import jakarta.servlet.ServletContext;
-import org.example.example.persistance.domain.Category;
-import org.example.example.persistance.domain.CategoryType;
-import org.example.example.persistance.domain.Recipe;
-import org.example.example.persistance.domain.User;
+import lombok.NoArgsConstructor;
+import org.example.example.persistance.domain.*;
+import org.example.example.persistance.dtos.CategoryResponseDTO;
 import org.example.example.persistance.dtos.RecipeRequestDTO;
 import org.example.example.persistance.repository.CategoryRepository;
 import org.example.example.persistance.repository.RecipeRepository;
@@ -22,12 +27,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
-@ApplicationScoped
+@Singleton
+@Startup
+@TransactionAttribute(value = TransactionAttributeType.REQUIRED)
+@DependsOn("InitializeAdminService")
+@DeclareRoles({Role.ADMIN, Role.USER})
+@RunAs(Role.ADMIN)
+@NoArgsConstructor
 public class InitData {
 
     @Inject
@@ -37,29 +45,57 @@ public class InitData {
     private UserRepository repository;
     @Inject
     private CategoryRepository category;
-    @Inject
+    @EJB
     private RecipeService recipe;
 
-    private Path dir;
+//    @Resource(name = "avatarDir")
+//    private String avatarDir;
+
+    @Resource(name = "dir")
+    private String avatarInitDir;
 
     @Inject
-    private RequestContextController requestContextController;
+    private Pbkdf2PasswordHash passwordHash;
 
-    public void onStart(@Observes @Initialized(ApplicationScoped.class) Object init) {
-        boolean activated = requestContextController.activate();
-        try {
-            String avatarParam = context.getInitParameter("dir");
-            dir = Path.of(context.getRealPath("/"), avatarParam);
-            UserService.setPath(Path.of(dir + "/avatars/"));
-            initData();
-        } finally {
-            if (activated) requestContextController.deactivate();
-        }
-    }
-
+    @PostConstruct
     private void initData() {
-        Category category1 = Category.builder()
+        User user1 = User.builder()
                 .id(UUID.randomUUID())
+                .login("admin")
+                .name("Admin ADMIN")
+                .email("admin@gmail.com")
+                .password(passwordHash.generate("admin".toCharArray()))
+                .recipes(new ArrayList<>())
+                .avatar(Path.of("/" + avatarInitDir + "/gordon.png"))
+                .roles(List.of(Role.USER))
+                .build();
+
+        User user2 = User.builder()
+                .id(UUID.fromString("11111111-1111-1111-1111-000000000001"))
+                .login("user")
+                .name("User USER")
+                .email("user@gmail.com")
+                .password(passwordHash.generate("user".toCharArray()))
+                .recipes(new ArrayList<>())
+                .roles(List.of(Role.USER))
+                .build();
+
+        User user3 = User.builder()
+                .id(UUID.randomUUID())
+                .login("user1")
+                .name("User USER")
+                .email("user@gmail.com")
+                .password(passwordHash.generate("user1".toCharArray()))
+                .recipes(new ArrayList<>())
+                .roles(List.of(Role.USER))
+                .build();
+
+        repository.create(user1);
+        repository.create(user2);
+        repository.create(user3);
+
+        Category category1 = Category.builder()
+                .id(UUID.fromString("22222222-2222-2222-2222-000000000001"))
                 .name("Dania słone")
                 .type(CategoryType.DINNER)
                 .recipes(new ArrayList<>())
@@ -74,37 +110,6 @@ public class InitData {
 
         category.create(category1);
         category.create(category2);
-
-        User user1 = User.builder()
-                .id(UUID.randomUUID())
-                .name("Adam Smith")
-                .email("adamsmith@gmail.com")
-                .recipes(new ArrayList<>())
-                .avatar(Path.of(dir + "/gordon.png"))
-                .build();
-        User user2 = User.builder()
-                .id(UUID.randomUUID())
-                .name("Jane Doe")
-                .email("janedoe@gmail.com")
-                .recipes(new ArrayList<>())
-                .build();
-        User user3 = User.builder()
-                .id(UUID.randomUUID())
-                .name("John Doe")
-                .email("johndoe@gmail.com")
-                .recipes(new ArrayList<>())
-                .build();
-        User user4 = User.builder()
-                .id(UUID.randomUUID())
-                .name("ABC DEF")
-                .email("abcdef@gmail.com")
-                .recipes(new ArrayList<>())
-                .build();
-
-        repository.create(user1);
-        repository.create(user2);
-        repository.create(user3);
-        repository.create(user4);
 
         RecipeRequestDTO recipe1 = RecipeRequestDTO.builder()
                 .title("Makaron")
@@ -158,7 +163,7 @@ public class InitData {
                 .title("Mięso")
                 .description("AABBCC")
                 .preparationTime(35)
-                .author(user4.getId())
+                .author(user2.getId())
                 .category(category1.getId())
                 .build();
 
@@ -169,20 +174,19 @@ public class InitData {
         recipe.create(recipe5);
         recipe.create(recipe6);
         recipe.create(recipe7);
-
     }
 
-    private byte[] readAvatar(String fileName) {
-        try {
-            Path avatarPath = dir.resolve(fileName);
-            if (Files.exists(avatarPath)) {
-                return Files.readAllBytes(avatarPath);
-            } else {
-                System.err.println("[WARN] Avatar file not found: " + avatarPath);
-                return null;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading avatar " + fileName, e);
-        }
-    }
+//    private byte[] readAvatar(String fileName) {
+//        try {
+//            Path avatarPath = avatarDir.resolve(fileName);
+//            if (Files.exists(avatarPath)) {
+//                return Files.readAllBytes(avatarPath);
+//            } else {
+//                System.err.println("[WARN] Avatar file not found: " + avatarPath);
+//                return null;
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException("Error reading avatar " + fileName, e);
+//        }
+//    }
 }

@@ -8,6 +8,8 @@
         <feature>faces-4.0</feature>
         <feature>restfulWS-3.1</feature>
         <feature>persistence-3.1</feature>
+        <feature>appSecurity-5.0</feature>
+        <feature>enterpriseBeans-4.0</feature>
     </featureManager>
 
     <dataSource id="FoodBlogDataSource" jndiName="jdbc/food-blog">
@@ -16,11 +18,22 @@
                     javax.sql.DataSource="org.h2.jdbcx.JdbcDataSource"
                     libraryRef="H2JDBCLib"/>
         <properties URL="jdbc:h2:mem:food-blog"
-                    user="sa"
-                    password=""/>
+                    />
     </dataSource>
 
     <library id="H2JDBCLib">
         <fileset dir="${wlp.install.dir}/usr/servers/defaultServer/lib/global/" includes="h2-2.2.220.jar"/>
     </library>
+
+    <application type="war" location="food-blog-1.0.war">
+        <application-bnd>
+            <security-role name="ADMIN">
+                <group name="ADMIN" access-id="group:jdbc/food-blog/ADMIN"/>
+                <run-as userid="admin-service"/>
+            </security-role>
+            <security-role name="USER">
+                <group name="USER" access-id="group:jdbc/food-blog/USER"/>
+            </security-role>
+        </application-bnd>
+    </application>
 </server>

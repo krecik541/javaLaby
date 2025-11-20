@@ -1,11 +1,13 @@
 package org.example.example.api;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.example.example.controller.CategoryController;
+import org.example.example.persistance.domain.Role;
 import org.example.example.persistance.dtos.CategoryRequestDTO;
 import org.example.example.persistance.dtos.CategoryResponseDTO;
 
@@ -45,6 +47,7 @@ public class CategoryRESTApi {
 
     @POST
     @Path("/categories")
+    @RolesAllowed(Role.ADMIN)
     public Response create(CategoryRequestDTO request) {
         try {
             UUID id = categoryController.create(request);
@@ -70,6 +73,7 @@ public class CategoryRESTApi {
 
     @DELETE
     @Path("/categories/{id}")
+    @RolesAllowed(Role.ADMIN)
     public Response delete(@PathParam("id") String id) {
         try {
             UUID uuid = UUID.fromString(id);

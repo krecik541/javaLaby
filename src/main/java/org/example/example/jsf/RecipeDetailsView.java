@@ -45,7 +45,7 @@ public class RecipeDetailsView implements Serializable {
                     .description(r.getDescription())
                     .preparationTime(r.getPreparationTime())
                     .dateOfAddition(r.getDateOfAddition())
-                    .author(r.getAuthor())
+                    .author(r.getAuthor().getId())
                     .category(r.getCategory().getId())
                     .build();
         } catch (Exception ignored) {}

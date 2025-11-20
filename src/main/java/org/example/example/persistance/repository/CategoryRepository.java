@@ -1,6 +1,7 @@
 package org.example.example.persistance.repository;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -10,7 +11,7 @@ import org.example.example.persistance.domain.Recipe;
 
 import java.util.*;
 
-@ApplicationScoped
+@Dependent
 public class CategoryRepository implements Repository<Category, UUID> {
 
     private EntityManager em;

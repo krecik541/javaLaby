@@ -1,5 +1,6 @@
 package org.example.example.controller;
 
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -16,17 +17,12 @@ import java.util.stream.Collectors;
 @RequestScoped
 public class CategoryController {
 
+    @EJB
     private CategoryService categoryService;
-    private RecipeController recipeController;
 
     public CategoryController() {
     }
 
-    @Inject
-    public CategoryController(CategoryService categoryService, RecipeController recipeController) {
-        this.categoryService = categoryService;
-        this.recipeController = recipeController;
-    }
 
     public CategoryResponseDTO findById(UUID id) {
         return categoryService.findById(id)

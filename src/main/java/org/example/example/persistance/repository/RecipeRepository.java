@@ -1,6 +1,6 @@
 package org.example.example.persistance.repository;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -8,7 +8,7 @@ import org.example.example.persistance.domain.Recipe;
 
 import java.util.*;
 
-@ApplicationScoped
+@Dependent
 public class RecipeRepository implements Repository<Recipe, UUID> {
 
     private EntityManager em;
@@ -67,5 +67,20 @@ public class RecipeRepository implements Repository<Recipe, UUID> {
         em.createQuery("delete from Recipe r where r.category.id = :id")
                 .setParameter("id", id)
                 .executeUpdate();
+    }
+
+    public List<Recipe> findByAuthor(UUID id) {
+        List<Recipe> l = em.createQuery("SELECT r FROM Recipe r where r.author.id = :id", Recipe.class)
+                .setParameter("id", id)
+                .getResultList();
+        return l;
+    }
+
+    public List<Recipe> findByAuthorAndCategory(UUID author, UUID category) {
+        List<Recipe> l = em.createQuery("SELECT r FROM Recipe r where r.author.id = :author and r.category.id = :category", Recipe.class)
+                .setParameter("author", author)
+                .setParameter("category", category)
+                .getResultList();
+        return l;
     }
 }

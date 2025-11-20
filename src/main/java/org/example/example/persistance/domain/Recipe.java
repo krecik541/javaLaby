@@ -23,7 +23,8 @@ public class Recipe {
     private int preparationTime;
     private Date dateOfAddition;
 
-    private UUID author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category;

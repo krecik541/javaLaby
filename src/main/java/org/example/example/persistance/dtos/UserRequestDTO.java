@@ -10,5 +10,7 @@ import lombok.*;
 @ToString
 public class UserRequestDTO {
     private String name;
+    private String login;
     private String email;
+    private String password;
 }

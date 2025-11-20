@@ -1,34 +1,49 @@
 package org.example.example.service;
 
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ejb.EJB;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
+
+import jakarta.security.enterprise.SecurityContext;
+import lombok.NoArgsConstructor;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.Recipe;
+import org.example.example.persistance.domain.Role;
 import org.example.example.persistance.domain.User;
 import org.example.example.persistance.dtos.RecipeRequestDTO;
+import org.example.example.persistance.dtos.RecipeResponseDTO;
 import org.example.example.persistance.repository.RecipeRepository;
 
+import java.security.Principal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-@ApplicationScoped
+@LocalBean
+@Stateless
 public class RecipeService {
 
     private RecipeRepository recipeRepository;
+    @EJB
     private UserService userService;
+    @EJB
     private CategoryService categoryService;
+
+    @Inject
+    private SecurityContext securityContext;
 
     public RecipeService() {
     }
 
     @Inject
-    public RecipeService(RecipeRepository recipeRepository, UserService userService, CategoryService categoryService) {
+    public RecipeService(RecipeRepository recipeRepository) {
         this.recipeRepository = recipeRepository;
-        this.userService = userService;
-        this.categoryService = categoryService;
     }
 
     public Optional<Recipe> findById(UUID id) {
@@ -39,7 +54,42 @@ public class RecipeService {
         return recipeRepository.findAll();
     }
 
-    @Transactional
+    public List<RecipeResponseDTO> findAllDtos(UUID category) {
+        if(securityContext != null && securityContext.isCallerInRole(Role.ADMIN))
+            return findAll()
+                    .stream()
+                    .map(recipe -> RecipeResponseDTO.builder()
+                            .id(recipe.getId())
+                            .author(recipe.getAuthor().getId())
+                            .category(recipe.getCategory().getId())
+                            .dateOfAddition(recipe.getDateOfAddition())
+                            .description(recipe.getDescription())
+                            .preparationTime(recipe.getPreparationTime())
+                            .title(recipe.getTitle())
+                            .build())
+                    .collect(Collectors.toList());
+        else {
+            Principal principal = securityContext.getCallerPrincipal();
+            if (principal != null) {
+                Optional<User> user = userService.findByLogin(principal.getName());
+                return recipeRepository.findByAuthorAndCategory(user.get().getId(), category)
+                        .stream()
+                        .map(recipe -> RecipeResponseDTO.builder()
+                                .id(recipe.getId())
+                                .author(recipe.getAuthor().getId())
+                                .category(recipe.getCategory().getId())
+                                .dateOfAddition(recipe.getDateOfAddition())
+                                .description(recipe.getDescription())
+                                .preparationTime(recipe.getPreparationTime())
+                                .title(recipe.getTitle())
+                                .build())
+                        .collect(Collectors.toList());
+            }
+            return new ArrayList<>();
+        }
+    }
+
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public UUID create(RecipeRequestDTO dto) {
         Recipe recipe = Recipe.builder()
                 .title(dto.getTitle())
@@ -47,9 +97,15 @@ public class RecipeService {
                 .preparationTime(dto.getPreparationTime())
                 .dateOfAddition(java.sql.Date.valueOf(LocalDate.now()))
 
-                .author(dto.getAuthor())
+//                .author(userService.findById(dto.getAuthor()).orElse(null))
                 .category(categoryService.findById(dto.getCategory()).get())
                 .build();
+
+        if(securityContext != null && securityContext.getCallerPrincipal() != null) {
+            String s = securityContext.getCallerPrincipal().getName();
+            userService.findByLogin(s).ifPresent(recipe::setAuthor);
+        }
+
         recipeRepository.create(recipe);
 
         if (recipe.getCategory() != null) {
@@ -60,16 +116,15 @@ public class RecipeService {
         }
 
         if (recipe.getAuthor() != null) {
-            User author = userService.findById(recipe.getAuthor()).orElse(null);
+            User author = userService.findById(recipe.getAuthor().getId()).orElse(null);
             if (author != null) {
-                author.getRecipes().add(recipe.getId());
+                author.getRecipes().add(recipe);
             }
         }
 
         return recipe.getId();
     }
 
-    @Transactional
     public UUID delete(UUID id) {
         Recipe recipe = recipeRepository.findById(id).orElseThrow();
 
@@ -81,7 +136,7 @@ public class RecipeService {
         }
 
         if (recipe.getAuthor() != null) {
-            User author = userService.findById(recipe.getAuthor()).orElse(null);
+            User author = userService.findById(recipe.getAuthor().getId()).orElse(null);
             if (author != null) {
                 author.getRecipes().remove(recipe.getId());
             }
@@ -91,7 +146,6 @@ public class RecipeService {
         return id;
     }
 
-    @Transactional
     public UUID update(UUID uuid, RecipeRequestDTO dto) {
         Optional<Recipe> existingRecipeOpt = recipeRepository.findById(uuid);
         if (existingRecipeOpt.isEmpty()) {
@@ -105,15 +159,18 @@ public class RecipeService {
                 .description(dto.getDescription())
                 .preparationTime(dto.getPreparationTime())
                 .dateOfAddition(java.sql.Date.valueOf(LocalDate.now()))
-                .author(dto.getAuthor())
+                .author(userService.findById(dto.getAuthor()).get())
                 .category(categoryService.findById(dto.getCategory()).get())
                 .build();
         recipeRepository.update(uuid, user);
         return uuid;
     }
 
-    @Transactional
     public void deleteByCategory(UUID id) {
         recipeRepository.deleteByCategory(id);
+    }
+
+    public List<Recipe> findByAuthor(UUID id) {
+        return recipeRepository.findByAuthor(id);
     }
 }

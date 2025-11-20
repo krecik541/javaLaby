@@ -1,7 +1,10 @@
 package org.example.example.controller;
 
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.example.example.persistance.domain.Recipe;
+import org.example.example.persistance.domain.Role;
 import org.example.example.persistance.dtos.UserRequestDTO;
 import org.example.example.persistance.dtos.UserResponseDTO;
 import org.example.example.service.UserService;
@@ -16,15 +19,12 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class UserController {
 
+    @EJB
     private UserService userService;
 
     public UserController() {
     }
 
-    @Inject
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     public UserResponseDTO findById(UUID id) {
         return userService.findById(id)
@@ -33,7 +33,7 @@ public class UserController {
                         .email(user.getEmail())
                         .name(user.getName())
                         .hasAvatar(user.getAvatar() != null)
-                        .recipes(user.getRecipes())
+                        .recipes(user.getRecipes().stream().map(Recipe::getId).toList())
                         .build())
                 .orElseThrow();
     }
@@ -46,13 +46,13 @@ public class UserController {
                         .email(user.getEmail())
                         .name(user.getName())
                         .hasAvatar(user.getAvatar() != null)
-                        .recipes(user.getRecipes())
+                        .recipes(user.getRecipes().stream().map(Recipe::getId).toList())
                         .build())
                 .collect(Collectors.toList());
     }
 
     public UUID create(UserRequestDTO user) {
-        return userService.create(user);
+        return userService.create(user, Role.USER);
     }
 
     public UUID delete(UUID id) {

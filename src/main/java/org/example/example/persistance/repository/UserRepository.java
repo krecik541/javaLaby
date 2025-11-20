@@ -1,56 +1,67 @@
 package org.example.example.persistance.repository;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.User;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-@ApplicationScoped
+@Dependent
 public class UserRepository implements Repository<User, UUID> {
 
-    private final Map<UUID, User> users;
+    private EntityManager em;
 
-    public UserRepository() {
-        users = new HashMap<>();
+    @PersistenceContext(unitName = "foodPU")
+    public void setEm(EntityManager em) {
+        this.em = em;
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        User user = users.get(id);
-        if (user != null)
-            return Optional.of(user);
-        return Optional.empty();
+        return Optional.ofNullable(em.find(User.class, id));
     }
 
     @Override
     public List<User> findAll() {
-        return users.values()
-                .stream()
-                .toList();
+        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
 
     @Override
+    @Transactional
     public UUID create(User user) {
-        UUID id = UUID.randomUUID();
-        user.setId(id);
-        users.put(id, user);
+        if(user == null)
+            return  null;
+        em.persist(user);
+
+        return user.getId();
+    }
+
+    @Override
+    @Transactional
+    public UUID delete(UUID id) {
+        Optional<User> u = findById(id);
+        if(u.isEmpty())
+            return null;
+
+        em.remove(u.get());
         return id;
     }
 
     @Override
-    public UUID delete(UUID id) {
-        return users.remove(id) != null ? id : null;
-    }
-
-    @Override
+    @Transactional
     public UUID update(UUID id, User user) {
-        if (users.containsKey(id)) {
-            users.put(id, user);
-            return id;
-        }
-        return null;
+        Optional<User> u = findById(id);
+        if(u.isEmpty())
+            return null;
+
+        em.merge(user);
+        return id;
     }
 
 
@@ -71,4 +82,11 @@ public class UserRepository implements Repository<User, UUID> {
         return id;
     }
 
+    public Optional<User> findByLogin(String s) {
+        List<User> list = em.createQuery("SELECT u FROM User u WHERE u.login = :login", User.class)
+                .setParameter("login", s)
+                .getResultList();
+        if (list.isEmpty()) return Optional.empty();
+        return Optional.of(list.get(0));
+    }
 }
