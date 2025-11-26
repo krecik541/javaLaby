@@ -1,18 +1,92 @@
+
+#### Get all categories
+## @no-cookie-jar
+#GET http://localhost:9080/food-blog/api/categories
+#
+#### Get category by id
+## @no-cookie-jar
+#GET http://localhost:9080/food-blog/api/categories/{{id_category}}
+#
+#### Create category
+## @no-cookie-jar
+#POST http://localhost:9080/food-blog/api/categories
+#Content-Type: application/json
+#
+#{
+#  "name": "123",
+#  "type": "LUNCH"
+#}
+#
+#### Update category
+## @no-cookie-jar
+#PUT http://localhost:9080/food-blog/api/categories/{{id_category}}
+#Content-Type: application/json
+#
+#{
+#  "type": "BREAKFAST"
+#}
+#
+#### Delete category
+## @no-cookie-jar
+#DELETE http://localhost:9080/food-blog/api/categories/{{id_category}}
+#
+#
+#
+#
+#### Get all recipes
+## @no-cookie-jar
+#GET http://localhost:9080/food-blog/api/recipes
+#
+#### Get all recipes (by category)
+## @no-cookie-jar
+#GET http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes
+#
+#### Get specific recipe form specific category
+## @no-cookie-jar
+#GET http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes/{{id_recipe}}
+#
+#### Create recipe in category
+## @no-cookie-jar
+#POST http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes
+##Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==
+#Authorization: Basic dXNlcjp1c2Vy
+#Content-Type: application/json
+#
+#{
+#  "title": "test",
+#  "description": "created",
+#  "preparationTime": "1000"
+#}
+#
+#### Update recipe
+## @no-cookie-jar
+#PUT http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes/{{id_recipe}}
+#Content-Type: application/json
+#
+#{
+#  "title": "test",
+#  "description": "updated",
+#  "preparationTime": "5000"
+#}
+#
+#### Delete recipe
+## @no-cookie-jar
+#DELETE http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes/{{id_recipe}}
+
+
+
+
+
+
 @id_category=22222222-2222-2222-2222-000000000001
 
-@id_recipe=34862100-adec-4d4a-84e0-4b061d5736a7
-
-### Get all categories
-# @no-cookie-jar
-GET http://localhost:9080/food-blog/api/categories
-
-### Get category by id
-# @no-cookie-jar
-GET http://localhost:9080/food-blog/api/categories/{{id_category}}
+@id_recipe=2a2d3d98-e560-4521-bb46-8515bfe3328e
 
 ### Create category
 # @no-cookie-jar
 POST http://localhost:9080/food-blog/api/categories
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==  # admin
+Authorization: Basic dXNlcjp1c2Vy                   # user
 Content-Type: application/json
 
 {
@@ -20,50 +94,48 @@ Content-Type: application/json
   "type": "LUNCH"
 }
 
-### Update category
+
+### Get all categories
 # @no-cookie-jar
-PUT http://localhost:9080/food-blog/api/categories/{{id_category}}
+GET http://localhost:9080/food-blog/api/categories
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==  # admin
+#Authorization: Basic dXNlcjp1c2Vy                   # user
+
+
+### Create user
+# @no-cookie-jar
+POST http://localhost:9080/food-blog/api/users
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==  # admin
+#Authorization: Basic dXNlcjp1c2Vy                   # user
 Content-Type: application/json
 
 {
-  "type": "BREAKFAST"
+    "name": "test",
+    "login": "test",
+    "email": "email@test.com",
+    "password": "test"
 }
-
-### Delete category
-# @no-cookie-jar
-DELETE http://localhost:9080/food-blog/api/categories/{{id_category}}
-
-
 
 
 ### Get all recipes
 # @no-cookie-jar
 GET http://localhost:9080/food-blog/api/recipes
+Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==  # admin
+#Authorization: Basic dXNlcjp1c2Vy                   # user
+
 
 ### Get all recipes (by category)
 # @no-cookie-jar
 GET http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==  # admin
+Authorization: Basic dXNlcjp1c2Vy                   # user
 
-### Get specific recipe form specific category
-# @no-cookie-jar
-GET http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes/{{id_recipe}}
-
-### Create recipe in category
-# @no-cookie-jar
-POST http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes
-#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==
-Authorization: Basic dXNlcjp1c2Vy
-Content-Type: application/json
-
-{
-  "title": "test",
-  "description": "created",
-  "preparationTime": "1000"
-}
 
 ### Update recipe
 # @no-cookie-jar
 PUT http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes/{{id_recipe}}
+Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==  # admin
+#Authorization: Basic dXNlcjp1c2Vy                   # user
 Content-Type: application/json
 
 {
@@ -72,12 +144,23 @@ Content-Type: application/json
   "preparationTime": "5000"
 }
 
+
 ### Delete recipe
 # @no-cookie-jar
 DELETE http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes/{{id_recipe}}
+Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==  # admin
+#Authorization: Basic dXNlcjp1c2Vy                   # user
 
 
+### Create recipe in category
+# @no-cookie-jar
+POST http://localhost:9080/food-blog/api/categories/{{id_category}}/recipes
+Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbg==
+#Authorization: Basic dXNlcjp1c2Vy
+Content-Type: application/json
 
-
-[INFO] PBKDF2WithHmacSHA256:2048:RMhVNLzNCiC03JLDoD2gUBtSM4BBgHfsHEEOhUXl3jw=:5eD/Un1AC9LP13lT5YcvGHWRolfODrNIpb4fsBksH6s=
-[INFO] PBKDF2WithHmacSHA256:2048:03dyA9hUZcI93q1lANqLL34AmWhqKKnO1JaoRcoScBs=:jQ0GQMY8T7/kqfje5Tm59FZ4cN1SXlzZFE7OFm9rUsk=
+{
+  "title": "test",
+  "description": "test",
+  "preparationTime": "1000"
+}

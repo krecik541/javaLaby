@@ -18,6 +18,7 @@ import org.example.example.persistance.dtos.RecipeResponseDTO;
 import org.example.example.persistance.repository.RecipeRepository;
 
 import java.security.Principal;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class RecipeService {
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .preparationTime(dto.getPreparationTime())
-                .dateOfAddition(java.sql.Date.valueOf(LocalDate.now()))
+                .dateOfAddition(Date.valueOf(LocalDate.now()))
 
 //                .author(userService.findById(dto.getAuthor()).orElse(null))
                 .category(categoryService.findById(dto.getCategory()).get())
@@ -147,26 +148,54 @@ public class RecipeService {
     }
 
     public UUID update(UUID uuid, RecipeRequestDTO dto) {
+        User user = null;
+        if(securityContext != null && securityContext.getCallerPrincipal() != null) {
+            String s = securityContext.getCallerPrincipal().getName();
+            user = userService.findByLogin(s).get();
+        }
+
+        if(user == null)
+            return null;
+        List<Recipe> r = recipeRepository.findByAuthor(user.getId());
+
         Optional<Recipe> existingRecipeOpt = recipeRepository.findById(uuid);
         if (existingRecipeOpt.isEmpty()) {
             throw new IllegalArgumentException("Recipe not found");
         }
+        if (!r.contains(existingRecipeOpt.get()) && !user.getRoles().contains(Role.ADMIN))
+            throw new IllegalArgumentException("Recipe not found");
 
         Recipe existingRecipe = existingRecipeOpt.get();
-        Recipe user = Recipe.builder()
+        Recipe recipe = Recipe.builder()
                 .id(uuid)
-                .title(dto.getTitle())
-                .description(dto.getDescription())
+                .title(dto.getTitle() != null && !dto.getTitle().isEmpty() ? dto.getTitle() : existingRecipe.getTitle())
+                .description(dto.getDescription()  != null && !dto.getDescription().isEmpty() ? dto.getDescription() : existingRecipe.getDescription())
                 .preparationTime(dto.getPreparationTime())
-                .dateOfAddition(java.sql.Date.valueOf(LocalDate.now()))
-                .author(userService.findById(dto.getAuthor()).get())
-                .category(categoryService.findById(dto.getCategory()).get())
+                .dateOfAddition(Date.valueOf(LocalDate.now()))
+                .author(existingRecipe.getAuthor())
+                .category(existingRecipe.getCategory())
                 .build();
-        recipeRepository.update(uuid, user);
+        recipeRepository.update(uuid, recipe);
         return uuid;
     }
 
     public void deleteByCategory(UUID id) {
+        User user = null;
+        if(securityContext != null && securityContext.getCallerPrincipal() != null) {
+            String s = securityContext.getCallerPrincipal().getName();
+            user = userService.findByLogin(s).get();
+        }
+
+        if(user == null)
+            return;
+        List<Recipe> r = recipeRepository.findByAuthor(user.getId());
+
+        Optional<Recipe> existingRecipeOpt = recipeRepository.findById(id);
+        if (existingRecipeOpt.isEmpty()) {
+            throw new IllegalArgumentException("Recipe not found");
+        }
+        if (!r.contains(existingRecipeOpt.get()) && !user.getRoles().contains(Role.ADMIN))
+            throw new IllegalArgumentException("Recipe not found");
         recipeRepository.deleteByCategory(id);
     }
 

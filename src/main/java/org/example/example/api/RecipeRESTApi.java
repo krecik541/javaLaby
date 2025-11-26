@@ -27,17 +27,18 @@ public class RecipeRESTApi {
     @Inject
     RecipeController recipeController;
 
-//    @GET
-//    @Path("/category")
-//    @RolesAllowed(Role.ADMIN)
-//    public Response listAll() {
-//        List<RecipeResponseDTO> all = recipeController.find;
-//        List<RecipeRestDTO> converted = all.stream().map(Converter::convert).toList();
-//        return Response.ok(converted).build();
-//    }
+    @GET
+    @Path("/recipes")
+    @RolesAllowed(Role.ADMIN)
+    public Response listAll() {
+        List<RecipeResponseDTO> all = recipeController.findAll();
+        List<RecipeRestDTO> converted = all.stream().map(Converter::convert).toList();
+        return Response.ok(converted).build();
+    }
 
     @GET
     @Path("/categories/{categoryId}/recipes")
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Response listByCategory(@PathParam("categoryId") String categoryId) {
         try {
             UUID cid = UUID.fromString(categoryId);
@@ -51,6 +52,7 @@ public class RecipeRESTApi {
 
     @GET
     @Path("/categories/{categoryId}/recipes/{recipeId}")
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Response getById(@PathParam("categoryId") String categoryId, @PathParam("recipeId") String recipeId) {
         try {
             UUID cid = UUID.fromString(categoryId);

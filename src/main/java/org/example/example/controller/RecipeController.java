@@ -24,9 +24,9 @@ public class RecipeController {
     @Inject
     private SecurityContext securityContext;
 
-    public RecipeController(SecurityContext securityContext) {
-        this.securityContext = securityContext;
-    }
+//    public RecipeController(SecurityContext securityContext) {
+//        this.securityContext = securityContext;
+//    }
 
 
     public Recipe findById(UUID id) {
@@ -82,4 +82,16 @@ public class RecipeController {
         return r;
     }
 
+    public List<RecipeResponseDTO> findAll() {
+        return recipeService.findAll().stream()
+                .map(recipe -> RecipeResponseDTO.builder()
+                        .id(recipe.getId())
+                        .author(recipe.getAuthor().getId())
+                        .category(recipe.getCategory().getId())
+                        .dateOfAddition(recipe.getDateOfAddition())
+                        .description(recipe.getDescription())
+                        .preparationTime(recipe.getPreparationTime())
+                        .title(recipe.getTitle())
+                        .build()).toList();
+    }
 }

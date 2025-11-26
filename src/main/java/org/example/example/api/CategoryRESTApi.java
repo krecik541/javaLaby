@@ -25,6 +25,7 @@ public class CategoryRESTApi {
 
     @GET
     @Path("/categories")
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Response listAll() {
         List<CategoryResponseDTO> all = categoryController.findAll();
         return Response.ok(all).build();

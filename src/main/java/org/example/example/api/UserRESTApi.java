@@ -1,12 +1,14 @@
 package org.example.example.api;
 
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.example.example.controller.UserController;
+import org.example.example.persistance.domain.Role;
 import org.example.example.persistance.dtos.UserRequestDTO;
 import org.example.example.persistance.dtos.UserResponseDTO;
 
