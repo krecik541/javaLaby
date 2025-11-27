@@ -3,46 +3,66 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:f="jakarta.faces.core">
-    <f:view>
-        <h:head>
-            <meta charset="UTF-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <title><ui:insert name="title">Aplikacja Przepisów Kulinarnych</ui:insert></title>
-            <h:outputStylesheet name="css/style.css"/>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
-        </h:head>
+      xmlns:f="jakarta.faces.core">>
+<f:view>
+    <h:head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title><ui:insert name="title">#{messages['title']}</ui:insert></title>
+        <h:outputStylesheet library="css" name="style.css"/>
+    </h:head>
 
-        <h:body>
-            <div class="container">
-                <header class="header">
-                    <div class="header-content">
-                        <div class="logo">
-                            <h:graphicImage name="images.png" alt="logo" style="scale: 50%"/>
-                            <h1>Przepisy Kulinarne</h1>
-                        </div>
-                        <nav class="navigation">
-                            <ul>
-                                <li><a href="/food-blog/index.xhtml" class="nav-link">Home</a></li>
-                                <li><a href="/food-blog/categories/categories.xhtml" class="nav-link">Kategorie</a></li>
-                            </ul>
-                        </nav>
+    <h:body>
+        <div class="container">
+            <header class="site-header">
+                <div class="header-left">
+                    <div class="brand">
+                        <h:graphicImage library="images" name="#{localeBean.logoName}" styleClass="logo" alt="Food Blog"/>
                     </div>
-                </header>
+                    <div class="tagline">#{messages['tagline']}</div>
+                </div>
 
-                <main class="main-content">
-                    <ui:insert name="content">
-                        <p>Zawartość strony</p>
-                    </ui:insert>
-                </main>
+                <div class="header-center">
+                    <nav class="main-nav">
+                        <ul>
+                            <li><h:link outcome="/index.xhtml" value="#{messages['nav.home']}" styleClass="nav-link"/></li>
+                            <li><h:link outcome="/categories/categories.xhtml" value="#{messages['nav.categories']}" styleClass="nav-link"/></li>
+                            <li>
+                                <h:panelGroup rendered="#{authView.admin}">
+                                    <h:link outcome="/users/users.xhtml" value="#{messages['nav.users']}" styleClass="nav-link"/>
+                                </h:panelGroup>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
 
-                <footer class="footer">
-                    <div class="footer-content">
-                        <p>2025 Aplikacja Przepisów Kulinarnych. Wszystkie prawa zastrzeżone.</p>
-                    </div>
-                </footer>
-            </div>
+                <div class="header-right auth">
+                    <h:panelGroup rendered="#{not empty authView.currentUserName}">
+                        <span class="hello">#{messages['hello']},</span>
+                        <span class="username">#{authView.currentUserName}</span>
+                        <h:form style="display:inline;">
+                            <h:commandButton value="#{messages['logout']}" action="#{userLogout.logout}" styleClass="btn btn-link" />
+                        </h:form>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{empty authView.currentUserName}">
+                        <h:link outcome="/authentication/login.xhtml" value="#{messages['login']}" styleClass="nav-link login-link"/>
+                    </h:panelGroup>
+                </div>
+            </header>
 
-        </h:body>
-    </f:view>
+            <main class="content">
+                <ui:insert name="content">
+                    <h:panelGroup>
+                        <h2>#{messages['welcome.title']}</h2>
+                        <p>#{messages['welcome.body']}</p>
+                    </h:panelGroup>
+                </ui:insert>
+            </main>
+
+            <footer class="site-footer">
+                <div>© 2025 #{messages['title']}</div>
+            </footer>
+        </div>
+    </h:body>
+</f:view>
 </html>

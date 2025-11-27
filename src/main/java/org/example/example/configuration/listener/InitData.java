@@ -3,6 +3,7 @@ package org.example.example.configuration.listener;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.DeclareRoles;
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RunAs;
 import jakarta.ejb.*;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -22,6 +23,7 @@ import org.example.example.persistance.repository.UserRepository;
 import org.example.example.service.CategoryService;
 import org.example.example.service.RecipeService;
 import org.example.example.service.UserService;
+import org.example.example.persistance.repository.RecipeRepository;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,7 +36,6 @@ import java.util.*;
 @TransactionAttribute(value = TransactionAttributeType.REQUIRED)
 @DependsOn("InitializeAdminService")
 @DeclareRoles({Role.ADMIN, Role.USER})
-@RunAs(Role.ADMIN)
 @NoArgsConstructor
 public class InitData {
 
@@ -45,8 +46,8 @@ public class InitData {
     private UserRepository repository;
     @Inject
     private CategoryRepository category;
-    @EJB
-    private RecipeService recipe;
+    @Inject
+    private RecipeRepository recipeRepository;
 
 //    @Resource(name = "avatarDir")
 //    private String avatarDir;
@@ -58,6 +59,7 @@ public class InitData {
     private Pbkdf2PasswordHash passwordHash;
 
     @PostConstruct
+    @PermitAll
     private void initData() {
         User user1 = User.builder()
                 .id(UUID.randomUUID())
@@ -167,13 +169,21 @@ public class InitData {
                 .category(category1.getId())
                 .build();
 
-        recipe.create(recipe1);
-        recipe.create(recipe2);
-        recipe.create(recipe3);
-        recipe.create(recipe4);
-        recipe.create(recipe5);
-        recipe.create(recipe6);
-        recipe.create(recipe7);
+        Recipe r1 = Recipe.builder().title(recipe1.getTitle()).description(recipe1.getDescription()).preparationTime(recipe1.getPreparationTime()).author(user1).category(category1).build();
+        Recipe r2 = Recipe.builder().title(recipe2.getTitle()).description(recipe2.getDescription()).preparationTime(recipe2.getPreparationTime()).author(user2).category(category1).build();
+        Recipe r3 = Recipe.builder().title(recipe3.getTitle()).description(recipe3.getDescription()).preparationTime(recipe3.getPreparationTime()).author(user1).category(category1).build();
+        Recipe r4 = Recipe.builder().title(recipe4.getTitle()).description(recipe4.getDescription()).preparationTime(recipe4.getPreparationTime()).author(user1).category(category2).build();
+        Recipe r5 = Recipe.builder().title(recipe5.getTitle()).description(recipe5.getDescription()).preparationTime(recipe5.getPreparationTime()).author(user3).category(category2).build();
+        Recipe r6 = Recipe.builder().title(recipe6.getTitle()).description(recipe6.getDescription()).preparationTime(recipe6.getPreparationTime()).author(user1).category(category2).build();
+        Recipe r7 = Recipe.builder().title(recipe7.getTitle()).description(recipe7.getDescription()).preparationTime(recipe7.getPreparationTime()).author(user2).category(category1).build();
+
+        recipeRepository.create(r1);
+        recipeRepository.create(r2);
+        recipeRepository.create(r3);
+        recipeRepository.create(r4);
+        recipeRepository.create(r5);
+        recipeRepository.create(r6);
+        recipeRepository.create(r7);
     }
 
 //    private byte[] readAvatar(String fileName) {

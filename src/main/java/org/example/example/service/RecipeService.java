@@ -91,6 +91,18 @@ public class RecipeService {
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
+    public List<Recipe> findForCurrentUser() {
+        if (securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
+            return recipeRepository.findAll();
+        }
+        Principal principal = securityContext == null ? null : securityContext.getCallerPrincipal();
+        if (principal == null) return List.of();
+        Optional<User> userOpt = userService.findByLogin(principal.getName());
+        if (userOpt.isEmpty()) return List.of();
+        return recipeRepository.findByAuthor(userOpt.get().getId());
+    }
+
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public UUID create(RecipeRequestDTO dto) {
         Recipe recipe = Recipe.builder()
                 .title(dto.getTitle())

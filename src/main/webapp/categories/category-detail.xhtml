@@ -5,7 +5,7 @@
                 xmlns:f="jakarta.faces.core"
                 template="/templates/template.xhtml">
 
-    <ui:define name="title">Szczegóły kategorii</ui:define>
+    <ui:define name="title">#{messages['category.detail.title']}</ui:define>
 
     <f:metadata>
         <f:viewParam name="id" value="#{categoryDetailsView.id}" />
@@ -13,56 +13,77 @@
     </f:metadata>
 
     <ui:define name="content">
+        <f:event type="preRenderView" listener="#{authView.checkAuth}" />
+
         <h:panelGroup rendered="#{categoryDetailsView.category != null}">
-            <h:panelGrid columns="2">
-                <h:outputText value="Name:" />
-                <h:outputText value="#{categoryDetailsView.category.name}" />
-                <h:outputText value="Type:" />
-                <h:outputText value="#{categoryDetailsView.category.type}" />
-            </h:panelGrid>
+            <div class="detail-panel">
+                <h2>#{categoryDetailsView.category.name}</h2>
+                <div class="detail-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">#{messages['category.field.type']}:</span>
+                        <span class="detail-value">#{categoryDetailsView.category.type}</span>
+                    </div>
+                </div>
 
-            <h:form>
-                <h:commandButton value="Delete category" action="#{categoryDetailsView.deleteCategory(categoryDetailsView.id)}"/>
-            </h:form>
+                <div class="action-buttons">
+                    <h:form style="display: inline;">
+                        <h:link outcome="/recipes/recipe-form.xhtml" styleClass="btn btn-primary" rendered="#{not empty authView.currentUserName}">
+                            <f:param name="categoryId" value="#{categoryDetailsView.id}" />
+                            <span>#{messages['recipe.add']}</span>
+                        </h:link>
+                    </h:form>
+                    <h:form style="display: inline;">
+                        <h:commandButton value="#{messages['category.delete']}" action="#{categoryDetailsView.deleteCategory(categoryDetailsView.id)}" rendered="#{authView.admin}" styleClass="btn btn-danger" onclick="return confirm('#{messages['confirm.delete']}');"/>
+                    </h:form>
+                </div>
+            </div>
 
-            <h:form>
-                <h:link outcome="/recipes/recipe-form.xhtml" value="Add recipe">
-                    <f:param name="categoryId" value="#{categoryDetailsView.id}" />
-                </h:link>
-            </h:form>
+            <div class="recipes-section">
+                <h3>#{messages['category.recipes.header']}</h3>
+                <h:form id="recipesForm">
+                    <h:messages id="messages" />
+                    <h:panelGroup rendered="#{empty categoryDetailsView.recipes}">
+                        <p class="text-muted">#{messages['notfound']}</p>
+                    </h:panelGroup>
+                    <h:dataTable id="recipesTable" value="#{categoryDetailsView.recipes}" var="recipe" styleClass="table" headerClass="table-header" rowClasses="table-row" rendered="#{not empty categoryDetailsView.recipes}">
+                        <h:column>
+                            <f:facet name="header">#{messages['recipe.field.title']}</f:facet>
+                            <h:outputText value="#{recipe.title}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">#{messages['recipe.field.description']}</f:facet>
+                            <h:outputText value="#{recipe.description}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">#{messages['recipe.field.prep']}</f:facet>
+                            <h:outputText value="#{recipe.preparationTime}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">#{messages['table.actions']}</f:facet>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <h:link outcome="/recipes/recipe-detail.xhtml" styleClass="action-link">
+                                    <f:param name="id" value="#{recipe.id}" />
+                                    #{messages['actions.view']}
+                                </h:link>
+                                <h:link outcome="/recipes/recipe-form.xhtml" rendered="#{authView.admin or authView.isOwner(recipe.author)}" styleClass="action-link">
+                                    <f:param name="id" value="#{recipe.id}" />
+                                    #{messages['actions.edit']}
+                                </h:link>
+                                <h:commandButton value="#{messages['actions.delete']}" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" rendered="#{authView.admin or authView.isOwner(recipe.author)}" styleClass="btn-delete" onclick="return confirm('#{messages['confirm.delete']}');">
+                                    <f:ajax execute="@this" render="recipesTable messages" />
+                                </h:commandButton>
+                            </div>
+                        </h:column>
+                    </h:dataTable>
+                </h:form>
+            </div>
         </h:panelGroup>
-        
+
         <h:panelGroup rendered="#{categoryDetailsView.category == null}">
-            <h2>Category not found</h2>
-            <h:link outcome="/categories/categories.xhtml" value="Back to categories list" />
-        </h:panelGroup>
-
-        <h:panelGroup rendered="#{categoryDetailsView.category != null}">
-            <h3>Recipes</h3>
-            <h:form>
-                <h:inputHidden id="categoryId" value="#{categoryDetailsView.id}" />
-                <h:dataTable value="#{categoryDetailsView.recipes}" var="recipe">
-                    <h:column>
-                        <f:facet name="header">Title</f:facet> #{recipe.title}
-                    </h:column>
-                    <h:column>
-                        <f:facet name="header">View</f:facet>
-                        <h:link outcome="/recipes/recipe-detail.xhtml">
-                            <f:param name="id" value="#{recipe.id}" /> View
-                        </h:link>
-                    </h:column>
-                    <h:column>
-                        <f:facet name="header">Edit</f:facet>
-                        <h:link outcome="/recipes/recipe-form.xhtml">
-                            <f:param name="id" value="#{recipe.id}" /> Edit
-                        </h:link>
-                    </h:column>
-                    <h:column>
-                        <f:facet name="header">Actions</f:facet>
-                        <h:commandButton value="Delete" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" />
-                    </h:column>
-                </h:dataTable>
-            </h:form>
+            <div class="not-found-panel">
+                <h2>#{messages['notfound']}</h2>
+                <h:link outcome="/categories/categories.xhtml" value="#{messages['nav.categories']}" styleClass="btn btn-primary" />
+            </div>
         </h:panelGroup>
 
     </ui:define>

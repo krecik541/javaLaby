@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <ui:define name="title">Rejestracja - Przepisy Kulinarne</ui:define>
+
+    <ui:define name="content">
+        <div style="max-width: 400px; margin: 50px auto;">
+            <h2>Rejestracja</h2>
+            <h:form id="registerForm">
+                <h:messages globalOnly="true" styleClass="error-message"/>
+                
+                <div class="input-group">
+                    <h:outputLabel for="name" value="Imię:" />
+                    <h:inputText id="name" value="#{registerView.name}" required="true" />
+                </div>
+
+                <div class="input-group">
+                    <h:outputLabel for="login" value="Login:" />
+                    <h:inputText id="login" value="#{registerView.login}" required="true" />
+                </div>
+
+                <div class="input-group">
+                    <h:outputLabel for="email" value="Email:" />
+                    <h:inputText id="email" value="#{registerView.email}" required="true" />
+                </div>
+
+                <div class="input-group">
+                    <h:outputLabel for="password" value="Hasło:" />
+                    <h:inputSecret id="password" value="#{registerView.password}" required="true" />
+                </div>
+
+                <div class="input-group">
+                    <h:outputLabel for="confirmPassword" value="Powtórz hasło:" />
+                    <h:inputSecret id="confirmPassword" value="#{registerView.confirmPassword}" required="true" />
+                </div>
+
+                <h:commandButton value="Zarejestruj się" action="#{registerView.register}" styleClass="button primary-button"/>
+            </h:form>
+
+            <p style="margin-top: 20px;">
+                Masz już konto? 
+                <h:link outcome="/login.xhtml" value="Zaloguj się" />
+            </p>
+        </div>
+    </ui:define>
+
+</ui:composition>

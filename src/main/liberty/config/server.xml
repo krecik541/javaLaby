@@ -25,15 +25,12 @@
         <fileset dir="${wlp.install.dir}/usr/servers/defaultServer/lib/global/" includes="h2-2.2.220.jar"/>
     </library>
 
+    <basicRegistry id="basic" realm="BasicRealm">
+        <user name="admin" password="admin"/>
+        <user name="user" password="user"/>
+        <user name="user1" password="user1"/>
+    </basicRegistry>
+
     <application type="war" location="food-blog-1.0.war">
-        <application-bnd>
-            <security-role name="ADMIN">
-                <group name="ADMIN" access-id="group:jdbc/food-blog/ADMIN"/>
-                <run-as userid="admin-service"/>
-            </security-role>
-            <security-role name="USER">
-                <group name="USER" access-id="group:jdbc/food-blog/USER"/>
-            </security-role>
-        </application-bnd>
     </application>
 </server>

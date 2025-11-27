@@ -6,13 +6,44 @@
                 template="/templates/template.xhtml">
 
     <ui:define name="content">
-        <article>
-            <header>
-                <h2>Home</h2>
-            </header>
-            <section>
-                <p>Recipe blog home page.</p>
-            </section>
-        </article>
+        <div class="welcome">
+            <h2>#{messages['welcome.title']}</h2>
+            <p>#{messages['welcome.body']}</p>
+        </div>
+
+        <div style="text-align: center; margin: 2rem 0;">
+            <h2>#{messages['welcome.explore']}</h2>
+            <p>#{messages['welcome.browse']}</p>
+            <div style="margin-top: 2rem;">
+                <h:link outcome="/categories/categories.xhtml" styleClass="btn btn-primary">
+                    <h:outputText value="#{messages['welcome.viewAllCategories']}" />
+                </h:link>
+            </div>
+        </div>
+
+<!--        <article style="margin-top: 2rem;">-->
+<!--            <h3>Featured Sections</h3>-->
+<!--            <section style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">-->
+<!--                <div class="panel">-->
+<!--                    <h4>Browse Recipes</h4>-->
+<!--                    <p>Discover a wide variety of recipes from our community members.</p>-->
+<!--                    <h:link outcome="/categories/categories.xhtml" styleClass="link">-->
+<!--                        <h:outputText value="#{messages['welcome.goToCategories']} →" />-->
+<!--                    </h:link>-->
+<!--                </div>-->
+<!--                <div class="panel">-->
+<!--                    <h4>Share Your Recipe</h4>-->
+<!--                    <p>Don't have an account? Create one and share your favorite recipes with the community.</p>-->
+<!--                    <h:link outcome="/authentication/login.xhtml" rendered="#{empty authView.currentUserName}" styleClass="link">-->
+<!--                        <h:outputText value="Login or Register →" />-->
+<!--                    </h:link>-->
+<!--                    <h:panelGroup rendered="#{not empty authView.currentUserName}">-->
+<!--                        <h:link outcome="/categories/categories.xhtml" styleClass="link">-->
+<!--                            <h:outputText value="Add a Recipe →" />-->
+<!--                        </h:link>-->
+<!--                    </h:panelGroup>-->
+<!--                </div>-->
+<!--            </section>-->
+<!--        </article>-->
     </ui:define>
 </ui:composition>

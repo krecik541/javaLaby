@@ -12,76 +12,86 @@
     </f:metadata>
 
     <ui:define name="content">
-        <div class="form-container">
-            <h2 class="panel-title">Recipe form</h2>
+        <h:panelGroup rendered="#{not recipeFormView.accessDenied}">
+            <div class="form-container">
+                <h2 class="panel-title">#{empty recipeFormView.recipe.id ? messages['recipe.form.title'] : messages['recipe.edit.title']}</h2>
+                <h:panelGroup rendered="#{not empty recipeFormView.recipe.category}">
+                    <p class="text-muted">#{messages['category.field.name']}: #{recipeFormView.recipe.category.name}</p>
+                </h:panelGroup>
 
-            <h:form id="recipeForm">
-                <h:messages globalOnly="true" styleClass="error-message"/>
-                
-                <div class="form-grid">
-                    <div class="input-group">
-                        <h:outputLabel for="title" value="Title:" />
-                        <h:inputText id="title" value="#{recipeFormView.recipe.title}" 
-                                   required="true" 
-                                   requiredMessage="Title is required"
-                                   styleClass="input-text">
-                            <f:validateLength minimum="1" maximum="100"/>
-                        </h:inputText>
-                        <h:message for="title" styleClass="error-message"/>
-                    </div>
-
-                    <div class="input-group">
-                        <h:outputLabel for="description" value="Description:" />
-                        <h:inputTextarea id="description" 
-                                       value="#{recipeFormView.recipe.description}" 
+                <h:form id="recipeForm">
+                    <h:messages globalOnly="true" styleClass="error-message"/>
+                    
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <h:outputLabel for="title" value="Title:" />
+                            <h:inputText id="title" value="#{recipeFormView.recipe.title}" 
                                        required="true" 
-                                       requiredMessage="Description is required"
-                                       styleClass="input-textarea">
-                            <f:validateLength minimum="1" maximum="1000"/>
-                        </h:inputTextarea>
-                        <h:message for="description" styleClass="error-message"/>
-                    </div>
+                                       requiredMessage="Title is required"
+                                       styleClass="input-text">
+                                <f:validateLength minimum="1" maximum="100"/>
+                            </h:inputText>
+                            <h:message for="title" styleClass="error-message"/>
+                        </div>
 
-                    <div class="input-group">
-                        <h:outputLabel for="prepTime" value="Preparation time (minutes):" />
-                        <h:inputText id="prepTime" 
-                                   value="#{recipeFormView.recipe.preparationTime}" 
-                                   required="true" 
-                                   requiredMessage="Preparation time is required"
-                                   styleClass="input-text">
-                            <f:validateLongRange minimum="1" maximum="999"/>
-                        </h:inputText>
-                        <h:message for="prepTime" styleClass="error-message"/>
-                    </div>
+                        <div class="input-group">
+                            <h:outputLabel for="description" value="Description:" />
+                            <h:inputTextarea id="description" 
+                                           value="#{recipeFormView.recipe.description}" 
+                                           required="true" 
+                                           requiredMessage="Description is required"
+                                           styleClass="input-textarea">
+                                <f:validateLength minimum="1" maximum="1000"/>
+                            </h:inputTextarea>
+                            <h:message for="description" styleClass="error-message"/>
+                        </div>
 
-                    <div class="input-group">
-                        <h:outputLabel for="category" value="Category:" />
-                        <h:selectOneMenu id="category" 
-                                       value="#{recipeFormView.recipe.category.id}"
-                                       converter="uuidConverter" 
+                        <div class="input-group">
+                            <h:outputLabel for="prepTime" value="Preparation time (minutes):" />
+                            <h:inputText id="prepTime" 
+                                       value="#{recipeFormView.recipe.preparationTime}" 
                                        required="true" 
-                                       requiredMessage="Category is required"
-                                       styleClass="select-menu">
-                            <f:selectItem itemLabel="Select category" noSelectionOption="true" />
-                            <f:selectItems value="#{recipeFormView.categories}" 
-                                         var="c" 
-                                         itemLabel="#{c.name}" 
-                                         itemValue="#{c.id}" />
-                        </h:selectOneMenu>
-                        <h:message for="category" styleClass="error-message"/>
-                    </div>
-                </div>
+                                       requiredMessage="Preparation time is required"
+                                       styleClass="input-text">
+                                <f:validateLongRange minimum="1" maximum="999"/>
+                            </h:inputText>
+                            <h:message for="prepTime" styleClass="error-message"/>
+                        </div>
 
-                <div class="button-group">
-                    <h:commandButton value="Save" 
-                                   action="#{recipeFormView.save}" 
-                                   styleClass="button primary-button"/>
-                    <h:commandButton value="Cancel" 
-                                   action="/categories/categories.xhtml?faces-redirect=true" 
-                                   immediate="true" 
-                                   styleClass="button secondary-button"/>
-                </div>
-            </h:form>
-        </div>
+                        <div class="input-group">
+                            <h:outputLabel for="category" value="Category:" />
+                            <h:selectOneMenu id="category" 
+                                           value="#{recipeFormView.recipe.category.id}"
+                                           converter="uuidConverter" 
+                                           required="true" 
+                                           requiredMessage="Category is required"
+                                           styleClass="select-menu">
+                                <f:selectItem itemLabel="Select category" noSelectionOption="true" />
+                                <f:selectItems value="#{recipeFormView.categories}" 
+                                             var="c" 
+                                             itemLabel="#{c.name}" 
+                                             itemValue="#{c.id}" />
+                            </h:selectOneMenu>
+                            <h:message for="category" styleClass="error-message"/>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <h:commandButton value="#{messages['form.save']}" action="#{recipeFormView.save}" styleClass="btn btn-primary" />
+                        <h:commandButton value="#{messages['form.cancel']}" action="/categories/categories.xhtml?faces-redirect=true" immediate="true" styleClass="btn btn-secondary" />
+                        <h:commandButton value="#{messages['actions.delete']}" action="#{recipeFormView.delete}" rendered="#{not empty recipeFormView.recipe.id and (authView.admin or authView.isOwner(recipeFormView.recipe.author))}" onclick="return confirm('#{messages['confirm.delete']}');" styleClass="btn btn-danger" />
+                    </div>
+                </h:form>
+            </div>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{recipeDetailsView.accessDenied}">
+            <div class="not-found-panel">
+                <h2>#{messages['access.denied']}</h2>
+                <p>#{messages['access.denied.message']}</p>
+                <h:link outcome="/categories/categories.xhtml" value="#{messages['nav.categories']}" styleClass="btn btn-primary" />
+            </div>
+        </h:panelGroup>
+
     </ui:define>
 </ui:composition>

@@ -6,27 +6,31 @@
                 template="/templates/template.xhtml">
 
     <ui:define name="content">
+        <f:event type="preRenderView" listener="#{authView.checkAuth}" />
+        <h2>#{messages['categories.title']}</h2>
 
-        <h2>Lista kategorii</h2>
-        
-        <h:form>
-            <h:outputText value="Debug info: #{not empty categoryView.categories ? categoryView.categories.size() : 'No categories'} categories found" />
+        <h:form id="categoryForm">
 
-            <h:dataTable value="#{categoryView.categories}" var="cat" border="1">
+            <h:dataTable id="categoryTable" value="#{categoryView.categories}" var="cat" styleClass="table" headerClass="table-header" rowClasses="table-row">
 
                 <h:column>
-                    <f:facet name = "header">Name</f:facet> #{cat.name}
+                    <f:facet name="header">#{messages['categories.header.name']}</f:facet>
+                    <h:outputText value="#{cat.name}" />
                 </h:column>
                 <h:column>
-                    <f:facet name = "header">Type</f:facet> #{cat.type}
+                    <f:facet name="header">#{messages['categories.header.type']}</f:facet>
+                    <h:outputText value="#{cat.type}" />
                 </h:column>
                 <h:column>
-                    <f:facet name="header">Actions</f:facet>
-                    <h:link outcome="/categories/category-detail.xhtml" value="View">
-                        <f:param name="id" value="#{cat.id}"/>
-                    </h:link>
-                    &#160;
-                    <h:commandButton value="Delete" action="#{categoryView.delete(cat.id)}"/>
+                    <f:facet name="header">#{messages['table.actions']}</f:facet>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <h:link outcome="/categories/category-detail.xhtml" value="#{messages['actions.view']}" styleClass="action-link">
+                            <f:param name="id" value="#{cat.id}"/>
+                        </h:link>
+                        <h:commandButton value="#{messages['actions.delete']}" action="#{categoryView.delete(cat.id)}" rendered="#{authView.admin}" styleClass="btn-delete" onclick="return confirm('#{messages['confirm.delete']}');">
+                            <f:ajax execute="@this" render="categoryTable"/>
+                        </h:commandButton>
+                    </div>
                 </h:column>
             </h:dataTable>
         </h:form>

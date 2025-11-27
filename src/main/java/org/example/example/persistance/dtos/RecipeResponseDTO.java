@@ -22,13 +22,4 @@ public class RecipeResponseDTO {
 
     private UUID author;
     private UUID category;
-
-    public String getAuthor() {
-        return author.toString();
-    }
-
-    public String getCategory() {
-        return category.toString();
-    }
-
 }

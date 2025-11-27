@@ -11,39 +11,74 @@
     </f:metadata>
 
     <ui:define name="content">
+        <f:event type="preRenderView" listener="#{authView.checkAuth}" />
 
-        <h:panelGrid rendered="#{recipeDetailsView.recipe != null}" columns="2">
-            <h2>Recipe details</h2>
-
-            <h:outputText value="Title:" />
-            <h:outputText value="#{recipeDetailsView.recipe.title}" />
-            <h:outputText value="Category:" />
-            <h:panelGroup>
-                <h:outputText rendered="#{not empty recipeDetailsView.recipe.category}" value="" />
-                <h:link outcome="/categories/category-detail.xhtml"
-                        rendered="#{not empty recipeDetailsView.recipe.category}">
-                    <f:param name="id" value="#{recipeDetailsView.recipe.category}" />
-                    #{recipeDetailsView.getCategoryName(recipeDetailsView.recipe.category)}
-                </h:link>
-                <h:outputText rendered="#{empty recipeDetailsView.recipe.category}" value="-" />
-            </h:panelGroup>
-            <h:outputText value="Description:" />
-            <h:outputText value="#{recipeDetailsView.recipe.description}" />
-            <h:outputText value="Preparation time:" />
-            <h:outputText value="#{recipeDetailsView.recipe.preparationTime}" />
-            <h:outputText value="Date of addition:" />
-            <h:outputText value="#{recipeDetailsView.recipe.dateOfAddition}" />
-<!--            <h:outputText value="Author:" />-->
-<!--            <h:panelGroup>-->
-<!--                <h:outputText rendered="#{not empty recipeDetailsView.recipe.author}" value="#{recipeDetailsView.recipe.author.name}" />-->
-<!--                <h:outputText rendered="#{empty recipeDetailsView.recipe.artist}" value="-" />-->
-<!--            </h:panelGroup>-->
-        </h:panelGrid>
-
-        <h:panelGroup rendered="#{recipeDetailsView.recipe == null}">
-            <h2>Category not found</h2>
-            <h:link outcome="/index.xhtml" value="Back to home" />
+        <h:panelGroup rendered="#{recipeDetailsView.accessDenied}">
+            <div class="not-found-panel">
+                <h2>#{messages['access.denied']}</h2>
+                <p>#{messages['access.denied.message']}</p>
+                <h:link outcome="/categories/categories.xhtml" value="#{messages['nav.categories']}" styleClass="btn btn-primary" />
+            </div>
         </h:panelGroup>
+
+        <h:panelGroup rendered="#{not recipeDetailsView.accessDenied and recipeDetailsView.recipe != null}">
+            <div class="detail-panel">
+                <h2>#{recipeDetailsView.recipe.title}</h2>
+                
+                <div class="detail-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">#{messages['category.field.name']}:</span>
+                        <span class="detail-value">
+                            <h:panelGroup rendered="#{not empty recipeDetailsView.recipe.category}">
+                                <h:link outcome="/categories/category-detail.xhtml">
+                                    <f:param name="id" value="#{recipeDetailsView.recipe.category}" />
+                                    #{recipeDetailsView.getCategoryName(recipeDetailsView.recipe.category)}
+                                </h:link>
+                            </h:panelGroup>
+                            <h:outputText rendered="#{empty recipeDetailsView.recipe.category}" value="-" />
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">#{messages['recipe.field.description']}:</span>
+                        <span class="detail-value">#{recipeDetailsView.recipe.description}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">#{messages['recipe.field.prep']}:</span>
+                        <span class="detail-value">#{recipeDetailsView.recipe.preparationTime} min</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">#{messages['recipe.field.date']}:</span>
+                        <span class="detail-value">
+                            <h:outputText value="#{recipeDetailsView.recipe.dateOfAddition}">
+                                <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                            </h:outputText>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <h:form style="display: inline;">
+                        <h:link outcome="/recipes/recipe-form.xhtml" rendered="#{authView.admin or authView.isOwner(recipeDetailsView.recipe.author)}" styleClass="btn btn-primary">
+                            <f:param name="id" value="#{recipeDetailsView.id}" />
+                            #{messages['actions.edit']}
+                        </h:link>
+                    </h:form>
+                    <h:form style="display: inline;">
+                        <h:commandButton value="#{messages['actions.delete']}" action="#{recipeDetailsView.delete}" rendered="#{authView.admin or authView.isOwner(recipeDetailsView.recipe.author)}" styleClass="btn btn-danger" onclick="return confirm('#{messages['confirm.delete']}');">
+                            <f:ajax execute="@this" oncomplete="window.location='#{facesContext.externalContext.requestContextPath}/categories/categories.xhtml'" />
+                        </h:commandButton>
+                    </h:form>
+                </div>
+            </div>
+        </h:panelGroup>
+
+<!--        <h:panelGroup rendered="#{recipeDetailsView.accessDenied}">-->
+<!--            <div class="not-found-panel">-->
+<!--                <h2>#{messages['access.denied']}</h2>-->
+<!--                <p>#{messages['access.denied.message']}</p>-->
+<!--                <h:link outcome="/categories/categories.xhtml" value="#{messages['nav.categories']}" styleClass="btn btn-primary" />-->
+<!--            </div>-->
+<!--        </h:panelGroup>-->
 
     </ui:define>
 </ui:composition>

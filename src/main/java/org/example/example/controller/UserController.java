@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.domain.Role;
+import org.example.example.persistance.domain.User;
 import org.example.example.persistance.dtos.UserRequestDTO;
 import org.example.example.persistance.dtos.UserResponseDTO;
 import org.example.example.service.UserService;
@@ -25,6 +26,9 @@ public class UserController {
     public UserController() {
     }
 
+    public void createInit(User user) {
+        userService.create(user);
+    }
 
     public UserResponseDTO findById(UUID id) {
         return userService.findById(id)

@@ -19,6 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import org.example.example.persistance.dtos.UserResponseDTO;
+import org.example.example.persistance.domain.Recipe;
 
 @LocalBean
 @Stateless
@@ -111,5 +113,22 @@ public class UserService {
 
     public Optional<User> findByLogin(String s) {
         return userRepository.findByLogin(s);
+    }
+
+    public void create(User user) {
+        userRepository.create(user);
+    }
+
+    public List<UserResponseDTO> findAllDtos() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> UserResponseDTO.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .hasAvatar(user.getAvatar() != null)
+                        .recipes(user.getRecipes().stream().map(Recipe::getId).toList())
+                        .build())
+                .toList();
     }
 }

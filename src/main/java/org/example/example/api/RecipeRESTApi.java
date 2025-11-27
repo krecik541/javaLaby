@@ -130,7 +130,7 @@ public class RecipeRESTApi {
                     .description(recipe.getDescription())
                     .preparationTime(recipe.getPreparationTime())
                     .dateOfAddition(recipe.getDateOfAddition())
-                    .category(UUID.fromString(recipe.getCategory()))
+                    .category(UUID.fromString(recipe.getCategory().toString()))
                     .build();
         }
 

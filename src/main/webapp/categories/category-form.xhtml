@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{categoryFormView.id}" />
+        <f:viewAction action="#{categoryFormView.init}" />
+    </f:metadata>
+
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{authView.checkAdminAuth}" />
+        <h2>#{messages['category.form.title']}</h2>
+
+        <h:form id="categoryForm">
+            <h:panelGrid columns="2">
+                <h:outputText value="#{messages['category.field.name']}" />
+                <h:inputText value="#{categoryFormView.name}" />
+
+                <h:outputText value="#{messages['category.field.type']}" />
+                <h:selectOneMenu value="#{categoryFormView.type}">
+                    <f:selectItems value="#{categoryFormView.typeOptions}" var="t" itemValue="#{t}" itemLabel="#{t}" />
+                </h:selectOneMenu>
+            </h:panelGrid>
+
+            <h:commandButton value="#{messages['form.save']}" action="#{categoryFormView.save}" />
+            <h:commandButton value="#{messages['form.cancel']}" action="/categories/categories.xhtml?faces-redirect=true" immediate="true" />
+        </h:form>
+    </ui:define>
+</ui:composition>
