@@ -9,6 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import jakarta.security.enterprise.SecurityContext;
 import lombok.NoArgsConstructor;
+import org.example.example.configuration.listener.Log;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.domain.Role;
@@ -103,6 +104,7 @@ public class RecipeService {
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
+    @Log
     public UUID create(RecipeRequestDTO dto) {
         Recipe recipe = Recipe.builder()
                 .title(dto.getTitle())

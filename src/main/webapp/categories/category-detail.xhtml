@@ -33,7 +33,7 @@
                         </h:link>
                     </h:form>
                     <h:form style="display: inline;">
-                        <h:commandButton value="#{messages['category.delete']}" action="#{categoryDetailsView.deleteCategory(categoryDetailsView.id)}" rendered="#{authView.admin}" styleClass="btn btn-danger" onclick="return confirm('#{messages['confirm.delete']}');"/>
+                        <h:commandButton value="#{messages['category.delete']}" action="#{categoryDetailsView.deleteCategory(categoryDetailsView.id)}" rendered="#{authView.admin}" styleClass="btn btn-danger"/>
                     </h:form>
                 </div>
             </div>
@@ -69,7 +69,7 @@
                                     <f:param name="id" value="#{recipe.id}" />
                                     #{messages['actions.edit']}
                                 </h:link>
-                                <h:commandButton value="#{messages['actions.delete']}" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" rendered="#{authView.admin or authView.isOwner(recipe.author)}" styleClass="btn-delete" onclick="return confirm('#{messages['confirm.delete']}');">
+                                <h:commandButton value="#{messages['actions.delete']}" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" rendered="#{authView.admin or authView.isOwner(recipe.author)}" styleClass="btn-delete">
                                     <f:ajax execute="@this" render="recipesTable messages" />
                                 </h:commandButton>
                             </div>

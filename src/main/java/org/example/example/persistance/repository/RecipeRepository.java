@@ -46,7 +46,7 @@ public class RecipeRepository implements Repository<Recipe, UUID> {
         Optional<Recipe> r = findById(id);
         if(r.isEmpty())
             return null;
-
+        System.out.println("deleting " + id);
         em.remove(r.get());
         return id;
     }

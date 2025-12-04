@@ -27,7 +27,7 @@
                         <h:link outcome="/categories/category-detail.xhtml" value="#{messages['actions.view']}" styleClass="action-link">
                             <f:param name="id" value="#{cat.id}"/>
                         </h:link>
-                        <h:commandButton value="#{messages['actions.delete']}" action="#{categoryView.delete(cat.id)}" rendered="#{authView.admin}" styleClass="btn-delete" onclick="return confirm('#{messages['confirm.delete']}');">
+                        <h:commandButton value="#{messages['actions.delete']}" action="#{categoryView.delete(cat.id)}" rendered="#{authView.admin}" styleClass="btn-delete">
                             <f:ajax execute="@this" render="categoryTable"/>
                         </h:commandButton>
                     </div>

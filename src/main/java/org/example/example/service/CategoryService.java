@@ -6,10 +6,13 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.NoArgsConstructor;
+import org.example.example.controller.RecipeController;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.Recipe;
 import org.example.example.persistance.dtos.CategoryRequestDTO;
+import org.example.example.persistance.dtos.RecipeResponseDTO;
 import org.example.example.persistance.repository.CategoryRepository;
+import org.example.example.persistance.repository.RecipeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +23,18 @@ import java.util.UUID;
 @Stateless
 public class CategoryService {
 
+    @Inject
     private CategoryRepository categoryRepository;
+
+    private RecipeController recipeController;
 
     public CategoryService() {
     }
 
     @Inject
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, RecipeController recipeController) {
         this.categoryRepository = categoryRepository;
+        this.recipeController = recipeController;
     }
 
     public Optional<Category> findById(UUID id) {
@@ -53,6 +60,10 @@ public class CategoryService {
     public UUID delete(UUID id) {
         Optional<Category> categoryOpt = findById(id);
         if (categoryOpt.isPresent()) {
+            List<RecipeResponseDTO> recipes = recipeController.findByCategory(id.toString());
+            for (RecipeResponseDTO r : recipes) {
+                recipeController.delete(r.getId());
+            }
             categoryRepository.delete(id);
             return id;
         }
