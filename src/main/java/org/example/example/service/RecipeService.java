@@ -21,6 +21,7 @@ import org.example.example.persistance.repository.RecipeRepository;
 import java.security.Principal;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +59,7 @@ public class RecipeService {
 
     public List<RecipeResponseDTO> findAllDtos(UUID category) {
         if(securityContext != null && securityContext.isCallerInRole(Role.ADMIN))
-            return findAll()
+            return recipeRepository.findByCategory(category)
                     .stream()
                     .map(recipe -> RecipeResponseDTO.builder()
                             .id(recipe.getId())
@@ -68,6 +69,8 @@ public class RecipeService {
                             .description(recipe.getDescription())
                             .preparationTime(recipe.getPreparationTime())
                             .title(recipe.getTitle())
+                            .createdAt(recipe.getCreatedAt() != null ? java.util.Date.from(recipe.getCreatedAt().plusHours(1).atZone(ZoneId.of("Europe/Warsaw")).toInstant()) : null)
+                            .updatedAt(recipe.getUpdatedAt() != null ? Date.from(recipe.getUpdatedAt().plusHours(1).atZone(ZoneId.of("Europe/Warsaw")).toInstant()) : null)
                             .build())
                     .collect(Collectors.toList());
         else {
@@ -84,6 +87,8 @@ public class RecipeService {
                                 .description(recipe.getDescription())
                                 .preparationTime(recipe.getPreparationTime())
                                 .title(recipe.getTitle())
+                                .createdAt(recipe.getCreatedAt() != null ? java.util.Date.from(recipe.getCreatedAt().plusHours(1).atZone(ZoneId.of("Europe/Warsaw")).toInstant()) : null)
+                                .updatedAt(recipe.getUpdatedAt() != null ? Date.from(recipe.getUpdatedAt().plusHours(1).atZone(ZoneId.of("Europe/Warsaw")).toInstant()) : null)
                                 .build())
                         .collect(Collectors.toList());
             }
@@ -188,6 +193,7 @@ public class RecipeService {
                 .dateOfAddition(Date.valueOf(LocalDate.now()))
                 .author(existingRecipe.getAuthor())
                 .category(existingRecipe.getCategory())
+                .createdAt(existingRecipe.getCreatedAt())
                 .build();
         recipeRepository.update(uuid, recipe);
         return uuid;
@@ -215,5 +221,23 @@ public class RecipeService {
 
     public List<Recipe> findByAuthor(UUID id) {
         return recipeRepository.findByAuthor(id);
+    }
+
+    public List<RecipeResponseDTO> findByFilters(String title, String description, Integer preparationTime, String authorName, UUID categoryId) {
+        List<Recipe> recipes = recipeRepository.findByFilters(title, description, preparationTime, authorName, categoryId);
+        
+        return recipes.stream()
+                .map(recipe -> RecipeResponseDTO.builder()
+                        .id(recipe.getId())
+                        .title(recipe.getTitle())
+                        .description(recipe.getDescription())
+                        .preparationTime(recipe.getPreparationTime())
+                        .dateOfAddition(recipe.getDateOfAddition())
+                        .author(recipe.getAuthor().getId())
+                        .category(recipe.getCategory().getId())
+                        .createdAt(recipe.getCreatedAt() != null ? java.util.Date.from(recipe.getCreatedAt().plusHours(1).atZone(ZoneId.of("Europe/Warsaw")).toInstant()) : null)
+                        .updatedAt(recipe.getUpdatedAt() != null ? Date.from(recipe.getUpdatedAt().plusHours(1).atZone(ZoneId.of("Europe/Warsaw")).toInstant()) : null)
+                        .build())
+                .collect(Collectors.toList());
     }
 }

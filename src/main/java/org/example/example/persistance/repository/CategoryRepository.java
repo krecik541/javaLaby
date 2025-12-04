@@ -8,6 +8,9 @@ import jakarta.transaction.Transactional;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.CategoryType;
 import org.example.example.persistance.domain.Recipe;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 
 import java.util.*;
 
@@ -28,7 +31,12 @@ public class CategoryRepository implements Repository<Category, UUID> {
 
     @Override
     public List<Category> findAll() {
-        return em.createQuery("SELECT c FROM Category c", Category.class).getResultList();
+//        return em.createQuery("SELECT c FROM Category c", Category.class).getResultList();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Category> cq = cb.createQuery(Category.class);
+        Root<Category> root = cq.from(Category.class);
+        cq.select(root);
+        return em.createQuery(cq).getResultList();
     }
 
     @Override

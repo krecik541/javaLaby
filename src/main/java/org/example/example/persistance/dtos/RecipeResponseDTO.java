@@ -22,4 +22,7 @@ public class RecipeResponseDTO {
 
     private UUID author;
     private UUID category;
+
+    private Date createdAt;
+    private Date updatedAt;
 }

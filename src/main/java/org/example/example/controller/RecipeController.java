@@ -65,21 +65,23 @@ public class RecipeController {
     }
 
     public List<RecipeResponseDTO> findByCategory(String id) {
-        List<Recipe> rr = recipeService.findAll();
-        rr = rr.stream().filter(recipe -> recipe.getCategory().getId().toString().equals(id)).toList();
+//        List<Recipe> rr = recipeService.findAll();
+//        rr = rr.stream().filter(recipe -> recipe.getCategory().getId().toString().equals(id)).toList();
+//
+//        List<RecipeResponseDTO> r = recipeService.findAll().stream()
+//                .filter(recipe -> recipe.getCategory().getId().toString().equals(id))
+//                .map(recipe -> RecipeResponseDTO.builder()
+//                .id(recipe.getId())
+//                .author(recipe.getAuthor().getId())
+//                .category(recipe.getCategory().getId())
+//                .dateOfAddition(recipe.getDateOfAddition())
+//                .description(recipe.getDescription())
+//                .preparationTime(recipe.getPreparationTime())
+//                .title(recipe.getTitle())
+//                .build()).toList();
+        List<RecipeResponseDTO> rr = recipeService.findAllDtos(UUID.fromString(id));
 
-        List<RecipeResponseDTO> r = recipeService.findAll().stream()
-                .filter(recipe -> recipe.getCategory().getId().toString().equals(id))
-                .map(recipe -> RecipeResponseDTO.builder()
-                .id(recipe.getId())
-                .author(recipe.getAuthor().getId())
-                .category(recipe.getCategory().getId())
-                .dateOfAddition(recipe.getDateOfAddition())
-                .description(recipe.getDescription())
-                .preparationTime(recipe.getPreparationTime())
-                .title(recipe.getTitle())
-                .build()).toList();
-        return r;
+        return rr;
     }
 
     public List<RecipeResponseDTO> findAll() {
@@ -93,5 +95,9 @@ public class RecipeController {
                         .preparationTime(recipe.getPreparationTime())
                         .title(recipe.getTitle())
                         .build()).toList();
+    }
+
+    public List<RecipeResponseDTO> findByFilters(String title, String description, Integer preparationTime, String authorName, UUID categoryId) {
+        return recipeService.findByFilters(title, description, preparationTime, authorName, categoryId);
     }
 }

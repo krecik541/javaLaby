@@ -33,17 +33,74 @@
                         </h:link>
                     </h:form>
                     <h:form style="display: inline;">
-                        <h:commandButton value="#{messages['category.delete']}" action="#{categoryDetailsView.deleteCategory(categoryDetailsView.id)}" rendered="#{authView.admin}" styleClass="btn btn-danger"/>
+                        <h:commandButton value="#{messages['category.delete']}" action="#{categoryDetailsView.deleteCategory(categoryDetailsView.id)}" rendered="#{authView.admin}" styleClass="btn btn-danger" onclick="return confirm('#{messages['confirm.delete']}');"/>
                     </h:form>
                 </div>
             </div>
 
             <div class="recipes-section">
                 <h3>#{messages['category.recipes.header']}</h3>
+                
+                <!-- Formularz filtrowania -->
+                <h:form id="filterForm" styleClass="filter-form">
+                    <div class="filter-section">
+                        <h4>#{messages['recipe.filter.title']}</h4>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <h:outputLabel for="titleFilter" value="#{messages['recipe.field.title']}:" />
+                                <h:inputText id="titleFilter" 
+                                           value="#{categoryDetailsView.titleFilter}" 
+                                           styleClass="form-control" 
+                                           placeholder="#{messages['recipe.filter.title.placeholder']}" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <h:outputLabel for="descriptionFilter" value="#{messages['recipe.field.description']}:" />
+                                <h:inputText id="descriptionFilter" 
+                                           value="#{categoryDetailsView.descriptionFilter}" 
+                                           styleClass="form-control"
+                                           placeholder="#{messages['recipe.filter.description.placeholder']}" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <h:outputLabel for="preparationTimeFilter" value="#{messages['recipe.field.preparationTime']}:" />
+                                <h:inputText id="preparationTimeFilter" 
+                                           value="#{categoryDetailsView.preparationTimeFilter}" 
+                                           styleClass="form-control"
+                                           placeholder="#{messages['recipe.filter.preparationTime.placeholder']}" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <h:outputLabel for="authorFilter" value="#{messages['recipe.field.author']}:" />
+                                <h:inputText id="authorFilter" 
+                                           value="#{categoryDetailsView.authorNameFilter}" 
+                                           styleClass="form-control"
+                                           placeholder="#{messages['recipe.filter.author.placeholder']}" />
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <h:commandButton value="#{messages['recipe.filter.search']}" 
+                                           action="#{categoryDetailsView.search}" 
+                                           styleClass="btn btn-primary">
+                                <f:ajax execute="@form" render=":recipesForm:recipesTable :recipesForm:messages :recipesForm:noRecipes" />
+                            </h:commandButton>
+                            <h:commandButton value="#{messages['recipe.filter.clear']}" 
+                                           action="#{categoryDetailsView.clearFilters}" 
+                                           styleClass="btn btn-secondary">
+                                <f:ajax execute="@form" render="@form :recipesForm:recipesTable :recipesForm:messages :recipesForm:noRecipes" />
+                            </h:commandButton>
+                        </div>
+                    </div>
+                </h:form>
+                
                 <h:form id="recipesForm">
                     <h:messages id="messages" />
-                    <h:panelGroup rendered="#{empty categoryDetailsView.recipes}">
-                        <p class="text-muted">#{messages['notfound']}</p>
+                    <h:panelGroup id="noRecipes" rendered="#{empty categoryDetailsView.recipes}">
+                        <p class="text-muted">#{messages['recipe.list.noResults']}</p>
                     </h:panelGroup>
                     <h:dataTable id="recipesTable" value="#{categoryDetailsView.recipes}" var="recipe" styleClass="table" headerClass="table-header" rowClasses="table-row" rendered="#{not empty categoryDetailsView.recipes}">
                         <h:column>
@@ -55,8 +112,24 @@
                             <h:outputText value="#{recipe.description}" />
                         </h:column>
                         <h:column>
-                            <f:facet name="header">#{messages['recipe.field.prep']}</f:facet>
+                            <f:facet name="header">#{messages['recipe.field.preparationTime']}</f:facet>
                             <h:outputText value="#{recipe.preparationTime}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">#{messages['recipe.field.author']}</f:facet>
+                            <h:outputText value="#{categoryDetailsView.getUserName(recipe.author)}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">#{messages['recipe.field.created']} <small>(#{messages['recipe.field.timezone']})</small></f:facet>
+                            <h:outputText value="#{recipe.createdAt}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">#{messages['recipe.field.updated']} <small>(#{messages['recipe.field.timezone']})</small></f:facet>
+                            <h:outputText value="#{recipe.updatedAt}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
                         </h:column>
                         <h:column>
                             <f:facet name="header">#{messages['table.actions']}</f:facet>
@@ -69,7 +142,7 @@
                                     <f:param name="id" value="#{recipe.id}" />
                                     #{messages['actions.edit']}
                                 </h:link>
-                                <h:commandButton value="#{messages['actions.delete']}" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" rendered="#{authView.admin or authView.isOwner(recipe.author)}" styleClass="btn-delete">
+                                <h:commandButton value="#{messages['actions.delete']}" action="#{categoryDetailsView.deleteRecipe(recipe.id.toString())}" rendered="#{authView.admin or authView.isOwner(recipe.author)}" styleClass="btn-delete" onclick="return confirm('#{messages['confirm.delete']}');">
                                     <f:ajax execute="@this" render="recipesTable messages" />
                                 </h:commandButton>
                             </div>

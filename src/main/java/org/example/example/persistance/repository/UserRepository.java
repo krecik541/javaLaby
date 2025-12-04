@@ -4,6 +4,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Dependent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.example.example.persistance.domain.Category;
 import org.example.example.persistance.domain.User;
@@ -29,7 +32,13 @@ public class UserRepository implements Repository<User, UUID> {
 
     @Override
     public List<User> findAll() {
-        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
+//        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+        cq.select(root);
+        return em.createQuery(cq).getResultList();
     }
 
     @Override
@@ -83,9 +92,15 @@ public class UserRepository implements Repository<User, UUID> {
     }
 
     public Optional<User> findByLogin(String s) {
-        List<User> list = em.createQuery("SELECT u FROM User u WHERE u.login = :login", User.class)
-                .setParameter("login", s)
-                .getResultList();
+//        List<User> list = em.createQuery("SELECT u FROM User u WHERE u.login = :login", User.class)
+//                .setParameter("login", s)
+//                .getResultList();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+        cq.select(root).where(cb.equal(root.get("login"), s));
+        List<User> list = em.createQuery(cq).getResultList();
+
         if (list.isEmpty()) return Optional.empty();
         return Optional.of(list.get(0));
     }

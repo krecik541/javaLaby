@@ -46,6 +46,15 @@ public class CategoryDetailsView implements Serializable {
     private CategoryResponseDTO category;
     private List<RecipeResponseDTO> recipes;
     private String recipeToDeleteId;
+    
+    // Pola filtrów
+    private String titleFilter;
+    private String descriptionFilter;
+    private Integer preparationTimeFilter;
+    private String authorNameFilter;
+    
+    // Lista użytkowników dla selecta
+    private List<User> users;
 
     public void init() {
         if (id != null && !id.isBlank()) {
@@ -53,6 +62,8 @@ public class CategoryDetailsView implements Serializable {
             CategoryResponseDTO foundCategory = categoryController.findById(uuid);
             if (foundCategory != null) {
                 this.category = foundCategory;
+                // Load users for filter
+                users = userService.findAll();
                 // Load recipes for this category
                 loadRecipes();
             }
@@ -65,7 +76,16 @@ public class CategoryDetailsView implements Serializable {
             return;
         }
         
-        List<RecipeResponseDTO> allRecipes = recipeController.findByCategory(id);
+        // Użycie filtrowania z Criteria API
+        UUID categoryId = UUID.fromString(id);
+        
+        List<RecipeResponseDTO> allRecipes = recipeController.findByFilters(
+                titleFilter,
+                descriptionFilter,
+                preparationTimeFilter,
+                authorNameFilter,
+                categoryId
+        );
         
         // Check if user is admin
         SecurityContext sc = getSecurityContext();
@@ -87,6 +107,24 @@ public class CategoryDetailsView implements Serializable {
         } else {
             recipes = List.of();
         }
+    }
+    
+    public void search() {
+        loadRecipes();
+    }
+    
+    public void clearFilters() {
+        titleFilter = null;
+        descriptionFilter = null;
+        preparationTimeFilter = null;
+        authorNameFilter = null;
+        loadRecipes();
+    }
+    
+    public String getUserName(UUID userId) {
+        return userService.findById(userId)
+                .map(User::getName)
+                .orElse("Unknown");
     }
 
     public List<RecipeResponseDTO> getRecipes() {
